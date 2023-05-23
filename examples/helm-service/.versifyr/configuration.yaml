@@ -1,0 +1,11 @@
+files:
+  - name: chart.yaml
+    type: yaml
+    path: chart/Chart.yaml
+  - name: pom.xml
+    type: xml
+    path: pom.xml
+  - name: Version.java
+    type: java
+    path: src/main/java/sample/Version.java
+
