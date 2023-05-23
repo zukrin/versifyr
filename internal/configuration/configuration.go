@@ -163,15 +163,15 @@ func NewConfig() (*Config, error) {
 	var k = koanf.New(".")
 
 	basepath := GetBasePath()
-	err := k.Load(file.Provider(basepath+"/"+CONFIG_FILENAME), yaml.Parser())
-	if err != nil {
-		return nil, err
-	}
-
 	c := &Config{
 		Debug:    false,
 		BasePath: basepath,
 		Simulate: false,
+	}
+
+	err := k.Load(file.Provider(basepath+"/"+CONFIG_FILENAME), yaml.Parser())
+	if err != nil {
+		return c, err
 	}
 
 	err = k.Unmarshal("", &c)
@@ -185,7 +185,7 @@ func NewConfig() (*Config, error) {
 		// load file
 		bytes, err := os.ReadFile(f.Path)
 		if err != nil {
-			return nil, err
+			return c, err
 		}
 
 		content := string(bytes)
