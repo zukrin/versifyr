@@ -102,7 +102,7 @@ files:
   - name: version.go
     type: go
     path: internal/versifyr/version.go
-	- name: chart.yaml
+  - name: chart.yaml
     type: yaml
     path: chart/Chart.yaml
   - name: pom.xml
