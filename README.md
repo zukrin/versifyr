@@ -4,7 +4,7 @@ Many times we need to manage the version of a project in many files. This tool c
 
 Versifyr allows to set values as defined from key=value pairs passed at command line.
 
-Files to be managed are listed in the configuration file `.versifyr/configuration.json` in the root of the project:
+Files to be managed are listed in the configuration file `.versifyr/configuration.yaml` in the root of the project:
 
 ```yaml
 
