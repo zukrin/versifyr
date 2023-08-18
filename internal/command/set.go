@@ -2,6 +2,7 @@ package command
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -105,7 +106,13 @@ func doSet(cCtx *cli.Context) error {
 		}
 	}
 
-	return nil
+	// write to output what has been done
+	result, err := json.Marshal(setFiles)
+	if err == nil {
+		logger.Info("{\"summary\": %s}", string(result))
+	}
+
+	return err
 }
 
 func setWellKnownValues(dictionary map[string]string) map[string]string {

@@ -47,11 +47,11 @@ func (p *Placeholder) String() string {
 // The placeholders are the lines of the file where the templates must be applied. The placeholders define also the
 // template to be applied.
 type ConfigFile struct {
-	Name         string         `koanf:"name"`
-	Path         string         `koanf:"path"`
-	Type         string         `koanf:"type"`
-	Lines        []string       `koanf:"-"`
-	Placeholders []*Placeholder `koanf:"-"`
+	Name         string         `koanf:"name" json:"name"`
+	Path         string         `koanf:"path" json:"path"`
+	Type         string         `koanf:"type" json:"type"`
+	Lines        []string       `koanf:"-" json:"-"`
+	Placeholders []*Placeholder `koanf:"-" json:"-"`
 }
 
 func (c *ConfigFile) String() string {
