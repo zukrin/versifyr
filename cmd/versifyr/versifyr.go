@@ -51,6 +51,8 @@ func main() {
 		HelpName:        "versifyr",
 		HideHelpCommand: false,
 		HideHelp:        false,
+		Description:     "handle versioning into project files",
+		Usage:           "handle versioning into project files",
 
 		Metadata: map[string]interface{}{
 			"config": cfg,
