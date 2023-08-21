@@ -24,10 +24,9 @@ import (
 
 // change content of files following the configured pattern and using the <k,v> pairs passssas arguments
 var SetCommand = &cli.Command{
-	Name:    "set",
-	Aliases: []string{"s"},
-	Usage:   "set values as key=value to be replaced in files",
-	Action:  doSet,
+	Name:   "set",
+	Usage:  "set values as key=value to be replaced in files",
+	Action: doSet,
 }
 
 func doSet(cCtx *cli.Context) error {
