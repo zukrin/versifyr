@@ -22,11 +22,23 @@ import (
 	"github.com/hashicorp/go-version"
 )
 
+var summary bool = false
+
 // change content of files following the configured pattern and using the <k,v> pairs passssas arguments
 var SetCommand = &cli.Command{
 	Name:   "set",
 	Usage:  "set values as key=value to be replaced in files",
 	Action: doSet,
+	Flags: []cli.Flag{
+		&cli.BoolFlag{
+			Name:        "summary",
+			Usage:       "print json summary at the end",
+			Destination: &summary,
+			Aliases:     []string{"sum"},
+			DefaultText: "false",
+			Value:       false,
+		},
+	},
 }
 
 func doSet(cCtx *cli.Context) error {
@@ -107,8 +119,8 @@ func doSet(cCtx *cli.Context) error {
 
 	// write to output what has been done
 	result, err := json.Marshal(setFiles)
-	if err == nil {
-		logger.Info("{\"summary\": %s}", string(result))
+	if err == nil && summary {
+		fmt.Printf("{\"summary\": %s}", string(result))
 	}
 
 	return err
