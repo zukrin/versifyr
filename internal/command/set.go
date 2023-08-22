@@ -120,7 +120,7 @@ func doSet(cCtx *cli.Context) error {
 	// write to output what has been done
 	result, err := json.Marshal(setFiles)
 	if err == nil && summary {
-		fmt.Printf("{\"summary\": %s}", string(result))
+		fmt.Printf("\n{\"summary\": %s}", string(result))
 	}
 
 	return err
