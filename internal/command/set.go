@@ -81,6 +81,9 @@ func doSet(cCtx *cli.Context) error {
 				return err
 			}
 			newline := newlineSW.String()
+			if file.Unescape {
+				newline = strings.ReplaceAll(newline, "\\\"", "\"")
+			}
 			file.Lines[p.Line] = newline
 			logger.Info("replaced into %s line %v with %s", file.Name, p.Line, file.Lines[p.Line])
 		}

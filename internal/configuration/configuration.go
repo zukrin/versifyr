@@ -50,6 +50,7 @@ type ConfigFile struct {
 	Name         string         `koanf:"name" json:"name"`
 	Path         string         `koanf:"path" json:"path"`
 	Type         string         `koanf:"type" json:"type"`
+	Unescape     bool           `koanf:"unescape" json:"unescape"`
 	Lines        []string       `koanf:"-" json:"-"`
 	Placeholders []*Placeholder `koanf:"-" json:"-"`
 }
@@ -59,6 +60,7 @@ func (c *ConfigFile) String() string {
 	res += "\tName: " + c.Name + "\n"
 	res += "\tPath: " + c.Path + "\n"
 	res += "\tType: " + c.Type + "\n"
+	res += "\tUnescape: " + strconv.FormatBool(c.Unescape) + "\n"
 	res += "\tPlaceholders:[\n"
 	for i, p := range c.Placeholders {
 		res += fmt.Sprintf("\t[%v]:%v\n", i, p)

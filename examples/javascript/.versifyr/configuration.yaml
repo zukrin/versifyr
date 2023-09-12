@@ -1,0 +1,7 @@
+files:
+  - name: package.json
+    type: json
+    path: package.json
+    unescape: true
+
+
