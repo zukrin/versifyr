@@ -167,7 +167,8 @@ replaced into version.go line 9 with const Compiled = "2023-05-23 10:28:58"
 
 
 
-> Nel caso sia necessario fare escape di virgolette nella definizione dei template (es json) è utilizzabile il flag unescape nella configurazione impostandolo a true. Es
+> When quote in templates must be escaped (i.e in json), use the configuration `unescape: true` flag (default: `false`). I.e:
+> 
  
   ```yaml
 
