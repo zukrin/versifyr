@@ -7,6 +7,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/Masterminds/sprig"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
@@ -208,9 +209,9 @@ func NewConfig() (*Config, error) {
 				}
 				tpltxt := l[s+len(VERIFYER_TEMPLATE_START) : e]
 
-				tpl, err := template.New(f.Name).Parse(tpltxt)
+				tpl, err := template.New(f.Name).Funcs(sprig.FuncMap()).Parse(tpltxt)
 				if err != nil {
-					return nil, err
+					return nil, fmt.Errorf("error in template '%v' cause %w", tpltxt, err)
 				}
 
 				ph := &Placeholder{

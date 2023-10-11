@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Masterminds/sprig"
 	"github.com/zukrin/versifyr/internal/configuration"
 	"github.com/zukrin/versifyr/internal/logging"
 
@@ -76,7 +77,7 @@ func doSet(cCtx *cli.Context) error {
 		for _, p := range file.Placeholders {
 			// for each placeholder replace the designed line with the template output
 			newlineSW := new(bytes.Buffer)
-			err := p.Template.Execute(newlineSW, dictionary)
+			err := p.Template.Funcs(sprig.FuncMap()).Execute(newlineSW, dictionary)
 			if err != nil {
 				return err
 			}

@@ -32,7 +32,8 @@ func main() {
 
 	cfg, err = configuration.NewConfig()
 	if err != nil {
-		logger.Info("Warn reading configuration file - %v", err)
+		logger.Info("ERROR reading configuration file - %v", err)
+		os.Exit(1)
 	}
 
 	ctm, _ := time.Parse("2006-01-02 15:04:05 -0700 MST", versifyr.Compiled)

@@ -179,3 +179,5 @@ replaced into version.go line 9 with const Compiled = "2023-05-23 10:28:58"
       unescape: true
 
   ```
+
+Versifyr supports sprig functions inside templates. See [sprig](http://masterminds.github.io/sprig/)
