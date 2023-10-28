@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"time"
 
@@ -23,18 +22,11 @@ import (
 // 	}
 // }
 
-var cfg *configuration.Config
+var cfg *configuration.Config = &configuration.Config{}
 
 var logger = logging.NewLogger()
 
 func main() {
-	var err error
-
-	cfg, err = configuration.NewConfig()
-	if err != nil {
-		logger.Info("ERROR reading configuration file - %v", err)
-		os.Exit(1)
-	}
 
 	ctm, _ := time.Parse("2006-01-02 15:04:05 -0700 MST", versifyr.Compiled)
 
@@ -94,12 +86,13 @@ func main() {
 		HideVersion:          false,
 
 		CommandNotFound: func(cCtx *cli.Context, command string) {
-			fmt.Fprintf(cCtx.App.ErrWriter, "Unknown command %q.\n", command)
+			logger.Error("Unknown command %q.", command)
+			os.Exit(1)
 		},
 
 		ExitErrHandler: func(cCtx *cli.Context, err error) {
 			if err != nil {
-				fmt.Fprintf(cCtx.App.ErrWriter, "Error: %v\n", err)
+				logger.Error("Error: %v", err)
 				os.Exit(1)
 			}
 		},
@@ -109,7 +102,30 @@ func main() {
 				return err
 			}
 
-			fmt.Fprintf(cCtx.App.ErrWriter, "WRONG: %#v\n", err)
+			logger.Error("WRONG: %#v", err)
+			return nil
+		},
+
+		Before: func(cCtx *cli.Context) error {
+
+			cfg := cCtx.App.Metadata["config"].(*configuration.Config)
+			logger := cCtx.App.Metadata["logger"].(*logging.Logger)
+
+			err := configuration.NewConfig(cfg)
+			if err != nil {
+				logger.Error("ERROR reading configuration file - %v", err)
+				os.Exit(1)
+			}
+
+			if cfg.Debug {
+				logger.LogLevel = logging.Debug
+			}
+
+			logger.Debug("debug enabled")
+			logger.Debug("configuration: %v", cfg)
+
+			cfg.CompilePatterns(logger)
+
 			return nil
 		},
 	}

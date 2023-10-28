@@ -2,3 +2,4 @@ files:
   - name: version.go
     type: go
     path: internal/versifyr/version.go
+

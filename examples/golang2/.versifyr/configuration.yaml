@@ -1,0 +1,15 @@
+
+#debug: true
+files:
+  - name: version.go
+    type: go
+    path: internal/versifyr/version.go
+    templates:
+      - row: 3
+        template: const Version = "{{ .version }}"
+      - row: 5
+        template: const Sample = "{{ .sample }}"
+      - row: 7
+        template: const ActualTimestamp = "{{ .version | replace "." "_" }}"
+      - row: 9
+        template: const Compiled = "{{ .actualtimestamp }}"

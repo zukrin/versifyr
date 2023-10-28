@@ -8,6 +8,7 @@ import (
 	"os"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -62,18 +63,18 @@ func doSet(cCtx *cli.Context) error {
 			return errors.New("syntax error defining values in " + a)
 		}
 		dictionary[vvv[0]] = vvv[1]
-
 	}
 
 	// set default values
 	dictionary = setWellKnownValues(dictionary)
-	logger.Info("using values %v", dictionary)
+	logger.Debug("using values %v", dictionary)
 
 	setFiles := make([]*configuration.ConfigFile, 0)
 
 	// replace values in files
 	for _, file := range cfg.Files {
 
+		logger.Debug("processing file %v", file)
 		for _, p := range file.Placeholders {
 			// for each placeholder replace the designed line with the template output
 			newlineSW := new(bytes.Buffer)
@@ -86,15 +87,16 @@ func doSet(cCtx *cli.Context) error {
 				newline = strings.ReplaceAll(newline, "\\\"", "\"")
 			}
 			file.Lines[p.Line] = newline
-			logger.Info("replaced into %s line %v with %s", file.Name, p.Line, file.Lines[p.Line])
+			logger.Debug("[%s] replaced %s => %s", file.Name, strconv.Itoa(p.Line), newline)
 		}
 		setFiles = append(setFiles, file)
 	}
 
+	newlineSW := new(bytes.Buffer)
+	newlineSW.WriteString("# transformed files\n")
 	// write back the files
 	if cfg.Simulate {
-		newlineSW := new(bytes.Buffer)
-		newlineSW.WriteString("# transformed files\n")
+		logger.Info("simulation mode, no changes will be done")
 		for _, file := range setFiles {
 			newlineSW.WriteString(fmt.Sprintf("## %s\n", file.Name))
 			newlineSW.WriteString(fmt.Sprintf("```%s\n", file.Type))
@@ -104,11 +106,11 @@ func doSet(cCtx *cli.Context) error {
 			newlineSW.WriteString("\n```\n")
 		}
 
-		result := markdown.Render(newlineSW.String(), 132, 6)
-		fmt.Println(string(result))
 	} else {
+
 		for _, file := range setFiles {
-			logger.Info("writing changes to file %s", file.Path)
+			newlineSW.WriteString(fmt.Sprintf("## %s\n", file.Name))
+			newlineSW.WriteString(fmt.Sprintf("```%s\n", file.Type))
 
 			outFile, err := os.OpenFile(file.Path, os.O_WRONLY|os.O_TRUNC, 0644)
 			if err != nil {
@@ -117,14 +119,20 @@ func doSet(cCtx *cli.Context) error {
 			defer outFile.Close()
 			for _, line := range file.Lines {
 				outFile.WriteString(line + "\n")
+				newlineSW.WriteString(line + "\n")
 			}
+			newlineSW.WriteString("\n```\n")
+
 		}
 	}
+
+	result := markdown.Render(newlineSW.String(), 132, 6)
+	logger.Info(string(result))
 
 	// write to output what has been done
 	result, err := json.Marshal(setFiles)
 	if err == nil && summary {
-		fmt.Printf("\n{\"summary\": %s}", string(result))
+		logger.Info("\n{\"summary\": %s}", string(result))
 	}
 
 	return err

@@ -11,6 +11,8 @@ import (
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
+
+	"github.com/zukrin/versifyr/internal/logging"
 )
 
 // A placeholder is a comment line found in text in form of
@@ -39,6 +41,11 @@ func (p *Placeholder) String() string {
 	return res
 }
 
+type Template struct {
+	Row      int    `koanf:"row" json:"row"`
+	Template string `koanf:"template" json:"template"`
+}
+
 // A ConfigFile is a file to be processed by versifyr.
 //
 // It contains the name of the file, the path to the file, the type of the file and the source of the file.
@@ -51,6 +58,7 @@ type ConfigFile struct {
 	Name         string         `koanf:"name" json:"name"`
 	Path         string         `koanf:"path" json:"path"`
 	Type         string         `koanf:"type" json:"type"`
+	Templates    []*Template    `koanf:"templates" json:"templates"`
 	Unescape     bool           `koanf:"unescape" json:"unescape"`
 	Lines        []string       `koanf:"-" json:"-"`
 	Placeholders []*Placeholder `koanf:"-" json:"-"`
@@ -61,6 +69,18 @@ func (c *ConfigFile) String() string {
 	res += "\tName: " + c.Name + "\n"
 	res += "\tPath: " + c.Path + "\n"
 	res += "\tType: " + c.Type + "\n"
+	res += "\tTemplates: [\n"
+	for i, p := range c.Templates {
+		res += "\t{\n"
+		res += "\t\tRow: " + strconv.Itoa(p.Row) + "\n"
+		res += "\t\tTemplate: " + p.Template + "\n"
+		if i > 0 {
+			res += "},\n"
+		} else {
+			res += "}\n"
+		}
+	}
+	res += "\t]\n"
 	res += "\tUnescape: " + strconv.FormatBool(c.Unescape) + "\n"
 	res += "\tPlaceholders:[\n"
 	for i, p := range c.Placeholders {
@@ -82,6 +102,9 @@ type Config struct {
 
 func (c *Config) String() string {
 	res := "Config{\n"
+	res += "\tDebug: " + strconv.FormatBool(c.Debug) + "\n"
+	res += "\tBasePath: " + c.BasePath + "\n"
+	res += "\tSimulate: " + strconv.FormatBool(c.Simulate) + "\n"
 	for _, f := range c.Files {
 		res += "\t" + f.String() + "\n"
 	}
@@ -136,15 +159,15 @@ func GetBasePath() string {
 }
 
 // CreateConfiguration creates a sample configuration file.
-func (cfg *Config) CreateConfiguration() error {
+func (cfg *Config) CreateConfiguration(logger *logging.Logger) error {
 	if !cfg.Simulate {
 		err := os.Mkdir(cfg.BasePath, 0755)
 		if err != nil {
 			return err
 		}
 	} else {
-		fmt.Println("Simulating creation of configuration file - mkdir skipped")
-		fmt.Println("folder: ", cfg.BasePath)
+		logger.Info("Simulating creation of configuration file - mkdir skipped")
+		logger.Info("folder: %s", cfg.BasePath)
 	}
 
 	if !cfg.Simulate {
@@ -157,36 +180,38 @@ func (cfg *Config) CreateConfiguration() error {
 		_, err = fl.WriteString(SAMPLE_CONFIG)
 		return err
 	} else {
-		fmt.Println("Simulating creation of configuration file - file creation skipped")
-		fmt.Println("file: ", cfg.BasePath+"/"+CONFIG_FILENAME)
-		fmt.Println("content:", SAMPLE_CONFIG)
+		logger.Info("Simulating creation of configuration file - file creation skipped")
+		logger.Info("file: %s/%s", cfg.BasePath, CONFIG_FILENAME)
+		logger.Info("content: %s", SAMPLE_CONFIG)
 
 		return nil
 	}
 }
 
 // NewConfig creates a new configuration from the configuration file.
-func NewConfig() (*Config, error) {
+func NewConfig(c *Config) error {
 	var k = koanf.New(".")
 
 	basepath := GetBasePath()
-	c := &Config{
-		Debug:    false,
-		BasePath: basepath,
-		Simulate: false,
-	}
+	c.BasePath = basepath
 
 	err := k.Load(file.Provider(basepath+"/"+CONFIG_FILENAME), yaml.Parser())
 	if err != nil {
-		return c, err
+		return err
 	}
 
 	err = k.Unmarshal("", &c)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
+	return nil
+}
+
+func (c *Config) CompilePatterns(logger *logging.Logger) (*Config, error) {
+
 	for _, f := range c.Files {
+		logger.Debug("compiling patterns, processing file %v", f)
 		f.Placeholders = make([]*Placeholder, 0)
 
 		// load file
@@ -199,15 +224,13 @@ func NewConfig() (*Config, error) {
 
 		// split lines
 		lines := strings.Split(content, "\n")
+		f.Lines = lines
 
-		// find placeholders
-		for i, l := range lines {
-			if s := strings.Index(l, VERIFYER_TEMPLATE_START); s > -1 {
-				e := strings.LastIndex(l, "$")
-				if e == -1 || e < s+len(VERIFYER_TEMPLATE_START) {
-					return nil, fmt.Errorf("template %s not closed at line %d", f.Name, i)
-				}
-				tpltxt := l[s+len(VERIFYER_TEMPLATE_START) : e]
+		if len(f.Templates) > 0 {
+			// pattern by configuration
+
+			for _, p := range f.Templates {
+				tpltxt := p.Template
 
 				tpl, err := template.New(f.Name).Funcs(sprig.FuncMap()).Parse(tpltxt)
 				if err != nil {
@@ -216,13 +239,39 @@ func NewConfig() (*Config, error) {
 
 				ph := &Placeholder{
 					TemplateText: tpltxt,
-					Line:         i + 1,
+					Line:         p.Row - 1,
 					Template:     tpl,
 				}
 				f.Placeholders = append(f.Placeholders, ph)
 			}
+
+		} else {
+			// pattern embeddded in file
+
+			// find placeholders
+			for i, l := range lines {
+				if s := strings.Index(l, VERIFYER_TEMPLATE_START); s > -1 {
+					e := strings.LastIndex(l, "$")
+					if e == -1 || e < s+len(VERIFYER_TEMPLATE_START) {
+						return nil, fmt.Errorf("template %s not closed at line %d", f.Name, i)
+					}
+					tpltxt := l[s+len(VERIFYER_TEMPLATE_START) : e]
+
+					tpl, err := template.New(f.Name).Funcs(sprig.FuncMap()).Parse(tpltxt)
+					if err != nil {
+						return nil, fmt.Errorf("error in template '%v' cause %w", tpltxt, err)
+					}
+
+					ph := &Placeholder{
+						TemplateText: tpltxt,
+						Line:         i + 1,
+						Template:     tpl,
+					}
+					f.Placeholders = append(f.Placeholders, ph)
+				}
+			}
 		}
-		f.Lines = lines
+
 	}
 	return c, nil
 }

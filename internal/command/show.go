@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/zukrin/versifyr/internal/configuration"
+	"github.com/zukrin/versifyr/internal/logging"
 
 	markdown "github.com/MichaelMure/go-term-markdown"
 	"github.com/urfave/cli/v2"
@@ -22,6 +23,7 @@ var ShowCommand = &cli.Command{
 func doShow(cCtx *cli.Context) error {
 
 	cfg := cCtx.App.Metadata["config"].(*configuration.Config)
+	logger := cCtx.App.Metadata["logger"].(*logging.Logger)
 
 	newlineSW := new(bytes.Buffer)
 	newlineSW.WriteString("# actual situation\n")
@@ -37,7 +39,7 @@ func doShow(cCtx *cli.Context) error {
 	}
 
 	result := markdown.Render(newlineSW.String(), 132, 6)
-	fmt.Println(string(result))
+	logger.Info(string(result))
 
 	return nil
 }

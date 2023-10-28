@@ -1,6 +1,6 @@
 # versifyr
 
-Many times we need to manage the version of a project in many files. This tool can set the version of a project in project files.
+Some times we need to manage the version of a project in many files. This tool can set the version of a project in project files.
 
 Versifyr allows to set values as defined from key=value pairs passed at command line.
 
@@ -53,6 +53,29 @@ version: 4.0.1
 appVersion: 4.0.1
 
 ```
+
+From version `0.0.11` `versifyer` can handle target rows and template definition inside configuration as follows:
+
+```yaml
+
+#debug: true
+files:
+  - name: version.go
+    type: go
+    path: internal/versifyr/version.go
+    templates:
+      - row: 3
+        template: const Version = "{{ .version }}"
+      - row: 5
+        template: const Sample = "{{ .sample }}"
+      - row: 7
+        template: const ActualTimestamp = "{{ .version | replace "." "_" }}"
+      - row: 9
+        template: const Compiled = "{{ .actualtimestamp }}"
+```
+
+This cam be useful when the target file syntax douesn't support comments (i.e text files). But... mind the row number!
+The two configuration are equivalent and can be mixed.
 
 Files can be any text file. `versifyr` can set any value passed at command line.
 
@@ -180,4 +203,8 @@ replaced into version.go line 9 with const Compiled = "2023-05-23 10:28:58"
 
   ```
 
-Versifyr supports sprig functions inside templates. See [sprig](http://masterminds.github.io/sprig/)
+Versifyr supports sprig functions inside templates. See [sprig](http://masterminds.github.io/sprig/). I.e:
+
+```go
+const ActualTimestamp = "{{ .version | replace "." "_" }}"
+```

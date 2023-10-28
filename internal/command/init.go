@@ -36,6 +36,6 @@ func doInit(cCtx *cli.Context) error {
 	}
 
 	// create if not
-	err = cfg.CreateConfiguration()
+	err = cfg.CreateConfiguration(logger)
 	return err
 }
