@@ -1,6 +1,6 @@
 module github.com/zukrin/versifyr
 
-go 1.20
+go 1.21
 
 require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
@@ -12,7 +12,6 @@ require (
 	github.com/knadh/koanf/v2 v2.0.1
 	github.com/pterm/pterm v0.12.61
 	github.com/urfave/cli/v2 v2.25.3
-	golang.org/x/exp v0.0.0-20220909182711-5c715a9e8561
 )
 
 require (
