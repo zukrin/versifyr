@@ -114,7 +114,7 @@ func main() {
 			err := configuration.NewConfig(cfg)
 			if err != nil {
 				logger.Error("ERROR reading configuration file - %v", err)
-				os.Exit(1)
+				// os.Exit(1)
 			}
 
 			if cfg.Debug {

@@ -137,10 +137,10 @@ files:
   - name: Version.java
     type: java
     path: src/main/java/sample/Version.java
-	- name: package.json
+  - name: package.json
     type: json
     path: package.json
-		unescape: true
+    unescape: true
 `
 
 // VERIFYER_TEMPLATE_START is the string that identifies the start of a template in a comment line.
