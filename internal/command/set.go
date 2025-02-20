@@ -8,7 +8,6 @@ import (
 	"os"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -48,7 +47,7 @@ func doSet(cCtx *cli.Context) error {
 	cfg := cCtx.App.Metadata["config"].(*configuration.Config)
 	logger := cCtx.App.Metadata["logger"].(*logging.Logger)
 
-	logger.Info("setting values")
+	logger.Debug("setting values")
 
 	if !cCtx.Args().Present() {
 		return errors.New("no values to set")
@@ -86,48 +85,53 @@ func doSet(cCtx *cli.Context) error {
 			if file.Unescape {
 				newline = strings.ReplaceAll(newline, "\\\"", "\"")
 			}
+			_old := file.Lines[p.Line]
 			file.Lines[p.Line] = newline
-			logger.Debug("[%s] replaced %s => %s", file.Name, strconv.Itoa(p.Line), newline)
+			logger.Debug("[%s] replaced line %v: '%s' => '%s'", file.Name, p.Line, _old, newline)
 		}
 		setFiles = append(setFiles, file)
 	}
 
-	newlineSW := new(bytes.Buffer)
-	newlineSW.WriteString("# transformed files\n")
 	// write back the files
 	if cfg.Simulate {
 		logger.Info("simulation mode, no changes will be done")
-		for _, file := range setFiles {
-			newlineSW.WriteString(fmt.Sprintf("## %s\n", file.Name))
-			newlineSW.WriteString(fmt.Sprintf("```%s\n", file.Type))
-			for _, line := range file.Lines {
-				newlineSW.WriteString(line + "\n")
+	}
+
+	reportBuffer := new(bytes.Buffer)
+	reportBuffer.WriteString("# transformed files\n")
+
+	for _, file := range setFiles {
+		reportBuffer.WriteString(fmt.Sprintf("## %s (%v)\n", file.Path, len(file.Lines)))
+		reportBuffer.WriteString(fmt.Sprintf("```%s\n", file.Type))
+
+		outputBuffer := new(bytes.Buffer)
+		for l, line := range file.Lines {
+			outputBuffer.WriteString(line)
+			if l < len(file.Lines)-1 {
+				outputBuffer.WriteString("\n")
 			}
-			newlineSW.WriteString("\n```\n")
 		}
+		reportBuffer.Write(outputBuffer.Bytes())
+		reportBuffer.WriteString("```\n")
 
-	} else {
-
-		for _, file := range setFiles {
-			newlineSW.WriteString(fmt.Sprintf("## %s\n", file.Name))
-			newlineSW.WriteString(fmt.Sprintf("```%s\n", file.Type))
-
+		if !cfg.Simulate {
 			outFile, err := os.OpenFile(file.Path, os.O_WRONLY|os.O_TRUNC, 0644)
 			if err != nil {
 				return err
 			}
 			defer outFile.Close()
-			for _, line := range file.Lines {
-				outFile.WriteString(line + "\n")
-				newlineSW.WriteString(line + "\n")
-			}
-			newlineSW.WriteString("\n```\n")
 
+			written, err := outFile.Write(outputBuffer.Bytes())
+			if err != nil {
+				return err
+			}
+			logger.Info("file %s written %v bytes", file.Path, written)
 		}
+
 	}
 
-	result := markdown.Render(newlineSW.String(), 132, 6)
-	logger.Debug(string(result))
+	result := markdown.Render(reportBuffer.String(), 132, 6)
+	logger.Debug("%s", string(result))
 
 	// write to output what has been done
 	result, err := json.Marshal(setFiles)
