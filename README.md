@@ -1,4 +1,4 @@
-[![Go](https://github.com/zukrin/versifyr/actions/workflows/go.yml/badge.svg)](https://github.com/zukrin/versifyr/actions/workflows/go.yml)
+[![Go](https://github.com/zukrin/versifyr/actions/workflows/go2.yml/badge.svg)](https://github.com/zukrin/versifyr/actions/workflows/go2.yml)
 
 # versifyr
 
