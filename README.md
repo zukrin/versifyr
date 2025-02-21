@@ -1,3 +1,5 @@
+[![Go](https://github.com/zukrin/versifyr/actions/workflows/go.yml/badge.svg)](https://github.com/zukrin/versifyr/actions/workflows/go.yml)
+
 # versifyr
 
 Some times we need to manage the version of a project in many files. This tool can set the version of a project in project files.
