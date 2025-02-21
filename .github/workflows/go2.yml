@@ -25,8 +25,29 @@ jobs:
       - name: Display Go version
         run: go version
 
-      - name: Build
-        run: go build -v github.com/zukrin/versifyr/cmd/versifyr
-  
       - name: Test
         run: go test -v github.com/zukrin/versifyr/cmd/versifyr
+
+      - name: Build-linux-amd64
+        run: go build -v -o dist/linux-amd64/versiifyr github.com/zukrin/versifyr/cmd/versifyr
+
+      - name: Build-darwin-amd64
+        run: GOOS=darwin GOARCH=arm64 go build -v -o dist/darwin-arm64/versiifyr github.com/zukrin/versifyr/cmd/versifyr
+
+      - name: Build-darwin-arm64
+        run: GOOS=darwin GOARCH=amd64 go build -v -o dist/darwin-amd64/versiifyr github.com/zukrin/versifyr/cmd/versifyr
+
+      # - name: Create Release
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      #   with:
+      #     tag_name: ${{ github.ref }}
+      #     release_name: Release ${{ github.ref }}
+      #     body: |
+      #       Changes in this Release
+      #       - First Change
+      #       - Second Change
+      #     draft: false
+      #     prerelease: false
