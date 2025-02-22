@@ -36,7 +36,7 @@ jobs:
       - name: Build-darwin-amd64
         run: GOOS=darwin GOARCH=arm64 go build -v -o dist/darwin-arm64/versifyr github.com/zukrin/versifyr/cmd/versifyr
       - name: Archive-darwin-amd64
-        run: tar -czvf dist/versifyr.darwin-amd64.tar.gz dist/darwin-arm64/versifyr
+        run: tar -czvf dist/versifyr.darwin-arm64.tar.gz dist/darwin-arm64/versifyr
 
       - name: Build-darwin-arm64
         run: GOOS=darwin GOARCH=amd64 go build -v -o dist/darwin-amd64/versifyr github.com/zukrin/versifyr/cmd/versifyr
@@ -47,8 +47,18 @@ jobs:
         run: ls -laR dist
 
       - name: version
-        run: echo "::set-output name=version::$(./dist/linux-amd64/versifyr --version)"
+        run: echo "version=$(./dist/darwin-arm64/versifyr --version)" >> $GITHUB_OUTPUT
         id: version
+
+
+      - name: Update CHANGELOG
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ github.token }}
+          tag: ${{ github.ref_name }}
+
+
       - name: release
         uses: actions/create-release@v1
         id: create_release
@@ -60,6 +70,13 @@ jobs:
           body_path: CHANGELOG.md
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Commit CHANGELOG.md
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: main
+          commit_message: 'docs: update CHANGELOG.md for ${{ github.ref_name }} [skip ci]'
+          file_pattern: CHANGELOG.md
 
       - name: upload linux artifact
         uses: actions/upload-release-asset@v1
