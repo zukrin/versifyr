@@ -58,7 +58,13 @@ jobs:
           token: ${{ github.token }}
           tag: ${{ github.ref_name }}
 
-
+      - name: Commit CHANGELOG.md
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: main
+          commit_message: 'docs: update CHANGELOG.md for ${{ github.ref_name }} [skip ci]'
+          file_pattern: CHANGELOG.md
+  
       - name: release
         uses: actions/create-release@v1
         id: create_release
@@ -71,12 +77,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      - name: Commit CHANGELOG.md
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          branch: main
-          commit_message: 'docs: update CHANGELOG.md for ${{ github.ref_name }} [skip ci]'
-          file_pattern: CHANGELOG.md
 
       - name: upload linux artifact
         uses: actions/upload-release-asset@v1
