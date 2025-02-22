@@ -29,13 +29,13 @@ jobs:
         run: go test -v github.com/zukrin/versifyr/cmd/versifyr
 
       - name: Build-linux-amd64
-        run: go build -v -o dist/linux-amd64/versiifyr github.com/zukrin/versifyr/cmd/versifyr
+        run: go build -v -o dist/linux-amd64/versifyr github.com/zukrin/versifyr/cmd/versifyr
 
       - name: Build-darwin-amd64
-        run: GOOS=darwin GOARCH=arm64 go build -v -o dist/darwin-arm64/versiifyr github.com/zukrin/versifyr/cmd/versifyr
+        run: GOOS=darwin GOARCH=arm64 go build -v -o dist/darwin-arm64/versifyr github.com/zukrin/versifyr/cmd/versifyr
 
       - name: Build-darwin-arm64
-        run: GOOS=darwin GOARCH=amd64 go build -v -o dist/darwin-amd64/versiifyr github.com/zukrin/versifyr/cmd/versifyr
+        run: GOOS=darwin GOARCH=amd64 go build -v -o dist/darwin-amd64/versifyr github.com/zukrin/versifyr/cmd/versifyr
 
       # - name: Create Release
       #   id: create_release
