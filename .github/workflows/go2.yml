@@ -50,11 +50,13 @@ jobs:
         run: echo "version=$(./dist/darwin-arm64/versifyr --version)" >> $GITHUB_OUTPUT
         id: version
 
+
       - name: Update CHANGELOG
         id: changelog
         uses: requarks/changelog-action@v1
         with:
           token: ${{ github.token }}
+          tag: ${{ github.ref_name }}
           writeToFile: true
 
       # - name: Commit CHANGELOG.md
