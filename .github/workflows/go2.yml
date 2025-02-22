@@ -94,16 +94,16 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bin/versifyr.darwin-amd64.tar.gz
+          asset_path: ./dist/versifyr.darwin-amd64.tar.gz
           asset_name: versifyr.darwin-amd64.tar.gz
           asset_content_type: application/gzip
-      - name: upload windows artifact
+      - name: upload darwin arm artifact
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bin/versifyr.windows-amd64.zip
-          asset_name: versifyr.windows-amd64.zip
-          asset_content_type: application/zip
+          asset_path: ./dist/versifyr.darwin-arm64.tar.gz
+          asset_name: versifyr.darwin-arm64.tar.gz
+          asset_content_type: application/gzip
     
