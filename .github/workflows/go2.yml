@@ -37,6 +37,8 @@ jobs:
       - name: Build-darwin-arm64
         run: GOOS=darwin GOARCH=amd64 go build -v -o dist/darwin-amd64/versifyr github.com/zukrin/versifyr/cmd/versifyr
 
+      - name: list files
+        run: ls -laR dist
       # - name: Create Release
       #   id: create_release
       #   uses: actions/create-release@v1
