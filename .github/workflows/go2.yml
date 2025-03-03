@@ -31,17 +31,17 @@ jobs:
       - name: Build-linux-amd64
         run: go build -v -o dist/linux-amd64/versifyr github.com/zukrin/versifyr/cmd/versifyr
       - name : Archive-linux-amd64
-        run: tar -czvf dist/versifyr.linux-amd64.tar.gz dist/linux-amd64/versifyr
+        run: tar -czvf dist/versifyr-linux-amd64.tar.gz dist/linux-amd64/versifyr
 
       - name: Build-darwin-amd64
         run: GOOS=darwin GOARCH=arm64 go build -v -o dist/darwin-arm64/versifyr github.com/zukrin/versifyr/cmd/versifyr
       - name: Archive-darwin-amd64
-        run: tar -czvf dist/versifyr.darwin-arm64.tar.gz dist/darwin-arm64/versifyr
+        run: tar -czvf dist/versifyr-darwin-arm64.tar.gz dist/darwin-arm64/versifyr
 
       - name: Build-darwin-arm64
         run: GOOS=darwin GOARCH=amd64 go build -v -o dist/darwin-amd64/versifyr github.com/zukrin/versifyr/cmd/versifyr
       - name: Archive-darwin-amd64
-        run: tar -czvf dist/versifyr.darwin-amd64.tar.gz dist/darwin-amd64/versifyr
+        run: tar -czvf dist/versifyr-darwin-amd64.tar.gz dist/darwin-amd64/versifyr
 
       - name: list files
         run: ls -laR dist
@@ -85,8 +85,8 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/versifyr.linux-amd64.tar.gz
-          asset_name: versifyr.linux-amd64.tar.gz
+          asset_path: ./dist/versifyr-linux-amd64.tar.gz
+          asset_name: versifyr-linux-amd64.tar.gz
           asset_content_type: application/gzip
       - name: upload darwin artifact
         uses: actions/upload-release-asset@v1
@@ -94,8 +94,8 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/versifyr.darwin-amd64.tar.gz
-          asset_name: versifyr.darwin-amd64.tar.gz
+          asset_path: ./dist/versifyr-darwin-amd64.tar.gz
+          asset_name: versifyr-darwin-amd64.tar.gz
           asset_content_type: application/gzip
       - name: upload darwin arm artifact
         uses: actions/upload-release-asset@v1
@@ -103,7 +103,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/versifyr.darwin-arm64.tar.gz
-          asset_name: versifyr.darwin-arm64.tar.gz
+          asset_path: ./dist/versifyr-darwin-arm64.tar.gz
+          asset_name: versifyr-darwin-arm64.tar.gz
           asset_content_type: application/gzip
     
