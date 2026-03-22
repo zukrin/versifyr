@@ -128,7 +128,7 @@ COPYRIGHT:
 ## installation
 
 ```sh
->  go install -v github.com/zukrin/versifyr/cmd/versifyr@latest
+go install -v github.com/zukrin/versifyr/cmd/versifyr@latest
 ```
 
 ## init
@@ -165,7 +165,7 @@ Use `versifyr set` to set values as key=value to be replaced in files. Use the o
 
 ```sh
 
-> versifyr -n set version="v0.0.1" sample="something" 
+versifyr -n set version="v0.0.1" sample="something" 
 setting values
 using values map[actualdate:2023-05-23 actualtime:10:28:58 actualtimestamp:2023-05-23 10:28:58 latesttag:unknown sample:something version:v0.0.1]
 replaced into version.go line 3 with const Version = "v0.0.1"
