@@ -104,12 +104,11 @@ jobs:
         run: echo "version=$(./dist/darwin-arm64/versifyr --version)" >> $GITHUB_OUTPUT
         id: version
 
-      - name: Update CHANGELOG
-        id: changelog
-        uses: requarks/changelog-action@60fe502cb1bbe8d74e3e1ed7540f636506c1d7c9 # v1.1.0
+      - name: Generate Changelog
+        uses: github-changelog-generator/github-changelog-generator@38df9c420a1d6fd0a1f78d9339c790cb29ee6678 # v1.16.4
         with:
           token: ${{ github.token }}
-          tag: ${{ github.ref_name }}
+          latestTag: ${{ github.ref_name }}
 
       - name: release
         uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
@@ -119,7 +118,7 @@ jobs:
           prerelease: false
           release_name: ${{ steps.version.outputs.version }}
           tag_name: ${{ github.ref }}
-          body: ${{ steps.changelog.outputs.changelog }}
+          body_path: CHANGELOG.md
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
