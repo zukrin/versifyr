@@ -27,9 +27,11 @@ tasks:
   advance-version:
     desc: Advance project version using versifyr CLI. Usage task advance-version [VERSION=v1.2.3]
     vars:
+      LATEST_TAG:
+        sh: git describe --tags --abbrev=0 || echo "v0.0.0"
       CALCULATED_VERSION:
-        sh: ./dist/versifyr show | grep version | awk '{print $2}' | awk -F. '{$NF+=1; OFS="."; print $0}'
+        sh: echo "{{.LATEST_TAG}}" | awk -F. '{$NF+=1; for(i=1;i<NF;i++) printf $i "."; print $NF}'
       NEXT_VERSION: '{{.VERSION | default .CALCULATED_VERSION}}'
     cmds:
-      - ./dist/versifyr set version={{.NEXT_VERSION}}
+      - ./dist/versifyr set version="{{.NEXT_VERSION}}"
 
