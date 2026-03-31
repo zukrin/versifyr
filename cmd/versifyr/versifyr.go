@@ -114,7 +114,7 @@ func main() {
 			err := configuration.NewConfig(cfg)
 			if err != nil {
 				logger.Error("ERROR reading configuration file - %v", err)
-				// os.Exit(1)
+				return err
 			}
 
 			if cfg.Debug {
@@ -126,8 +126,10 @@ func main() {
 
 			_, err = cfg.CompilePatterns(logger)
 			if err != nil {
-				logger.Debug("ERROR compiling patterns - %v", err)
+				logger.Error("ERROR compiling patterns - %v", err)
+				return err
 			}
+
 
 			return nil
 		},

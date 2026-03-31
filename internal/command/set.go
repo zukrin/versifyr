@@ -80,6 +80,7 @@ func doSet(cCtx *cli.Context) error {
 
 		err := file.ApplyTemplates(dictionary)
 		if err != nil {
+			logger.Error("ERROR applying templates to %s - %v", file.Name, err)
 			return err
 		}
 

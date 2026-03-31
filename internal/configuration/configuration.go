@@ -278,6 +278,7 @@ func (c *Config) CompilePatterns(logger *logging.Logger) (*Config, error) {
 					if err != nil {
 						return nil, fmt.Errorf("error in template '%v' cause %w", tpltxt, err)
 					}
+					tpl.Option("missingkey=error")
 
 					ph := &Placeholder{
 						TemplateText: tpltxt,
