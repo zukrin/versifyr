@@ -65,7 +65,7 @@ func TestLoggerMethods(t *testing.T) {
 	l.Error("test error %s", "arg")
 
 	// Verify writers
-	l.InfoWriter.Write([]byte("info test"))
-	l.ErrWriter.Write([]byte("error test"))
-	l.DebugWriter.Write([]byte("debug test"))
+	_, _ = l.InfoWriter.Write([]byte("info test"))
+	_, _ = l.ErrWriter.Write([]byte("error test"))
+	_, _ = l.DebugWriter.Write([]byte("debug test"))
 }

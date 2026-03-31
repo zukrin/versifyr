@@ -321,7 +321,7 @@ func TestConfigErrorPaths(t *testing.T) {
 	tmpDir, _ := os.MkdirTemp("", "versifyr-err-*")
 	defer os.RemoveAll(tmpDir)
 	fPath := filepath.Join(tmpDir, "unclosed.go")
-	os.WriteFile(fPath, []byte("// $versifyr:template={{ .v }}\nconst V = 1"), 0644)
+	_ = os.WriteFile(fPath, []byte("// $versifyr:template={{ .v }}\nconst V = 1"), 0644)
 	cfgUnclosed := &Config{
 		Files: []*ConfigFile{
 			{Path: fPath, Name: "unclosed.go"},
@@ -341,5 +341,8 @@ func TestConfigErrorPaths(t *testing.T) {
 	}
 	if _, err := cfgInvalid.CompilePatterns(logger); err == nil {
 		t.Error("CompilePatterns should fail for invalid template syntax")
+	}
+}
+te syntax")
 	}
 }

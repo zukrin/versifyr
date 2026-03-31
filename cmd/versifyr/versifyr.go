@@ -124,12 +124,15 @@ func main() {
 			logger.Debug("debug enabled")
 			logger.Debug("configuration: %v", cfg)
 
-			cfg.CompilePatterns(logger)
+			_, err = cfg.CompilePatterns(logger)
+			if err != nil {
+				logger.Debug("ERROR compiling patterns - %v", err)
+			}
 
 			return nil
 		},
 	}
 
-	app.Run(os.Args)
+	_ = app.Run(os.Args)
 
 }

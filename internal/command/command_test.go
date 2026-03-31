@@ -119,7 +119,7 @@ func TestCLIWorkflowErrors(t *testing.T) {
 	}
 
 	// 1. Init when folder exists
-	os.Mkdir(".versifyr", 0755)
+	_ = os.Mkdir(".versifyr", 0755)
 	if err := app.Run([]string{"versifyr-test", "init"}); err == nil {
 		t.Error("init should fail when .versifyr exists")
 	}
@@ -132,5 +132,8 @@ func TestCLIWorkflowErrors(t *testing.T) {
 	// 3. Set with malformed arg
 	if err := app.Run([]string{"versifyr-test", "set", "malformed"}); err == nil {
 		t.Error("set should fail with malformed arg")
+	}
+}
+)
 	}
 }
