@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Masterminds/sprig"
 	"github.com/zukrin/versifyr/internal/configuration"
 	"github.com/zukrin/versifyr/internal/logging"
 
@@ -74,21 +73,20 @@ func doSet(cCtx *cli.Context) error {
 	for _, file := range cfg.Files {
 
 		logger.Debug("processing file %v", file)
-		for _, p := range file.Placeholders {
-			// for each placeholder replace the designed line with the template output
-			newlineSW := new(bytes.Buffer)
-			err := p.Template.Funcs(sprig.FuncMap()).Execute(newlineSW, dictionary)
-			if err != nil {
-				return err
-			}
-			newline := newlineSW.String()
-			if file.Unescape {
-				newline = strings.ReplaceAll(newline, "\\\"", "\"")
-			}
-			_old := file.Lines[p.Line]
-			file.Lines[p.Line] = newline
-			logger.Debug("[%s] replaced line %v: '%s' => '%s'", file.Name, p.Line, _old, newline)
+
+		// track old lines for logging
+		oldLines := make([]string, len(file.Lines))
+		copy(oldLines, file.Lines)
+
+		err := file.ApplyTemplates(dictionary)
+		if err != nil {
+			return err
 		}
+
+		for _, p := range file.Placeholders {
+			logger.Debug("[%s] replaced line %v: '%s' => '%s'", file.Name, p.Line, oldLines[p.Line], file.Lines[p.Line])
+		}
+
 		setFiles = append(setFiles, file)
 	}
 
