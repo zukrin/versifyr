@@ -15,7 +15,7 @@ tasks:
     desc: Run tests and check coverage using go-test-coverage
     deps: [test]
     cmds:
-      - go install github.com/vladopajic/go-test-coverage/v2@latest
+      - go install github.com/vladopajic/go-test-coverage/v2@v2.18.4
       - go-test-coverage --config .testcoverage.yml
 
   build:

@@ -1,49 +1,19 @@
-# This workflow will build a golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
-
-name: Go2
+name: Release
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  coverage:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.23'
-
-      - name: generate test coverage
-        run: go test ./... -coverprofile=coverage.out
-
-      - name: check test coverage
-        uses: vladopajic/go-test-coverage@v2
-        with:
-          config: .testcoverage.yml
-          git-token: ${{ github.token }}
-          git-branch: main
-
   build:
-    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     strategy:
       matrix:
         go-version: [ '1.23' ]
 
     steps:
-
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Socket Security (Action)
         uses: SocketDev/action@ba6de6cc0565af1f42295590380973573297e31f # v1.3.2
@@ -54,11 +24,10 @@ jobs:
         run: sfw go mod download
 
       - name: Setup Go ${{ matrix.go-version }}
-        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5.1.0
         with:
           go-version: ${{ matrix.go-version }}
 
-      # You can test your matrix by printing the current Go version
       - name: Display Go version
         run: go version
 
@@ -70,12 +39,12 @@ jobs:
       - name : Archive-linux-amd64
         run: tar -czvf dist/versifyr-linux-amd64.tar.gz dist/linux-amd64/versifyr
 
-      - name: Build-darwin-amd64
+      - name: Build-darwin-arm64
         run: GOOS=darwin GOARCH=arm64 go build -v -o dist/darwin-arm64/versifyr github.com/zukrin/versifyr/cmd/versifyr
-      - name: Archive-darwin-amd64
+      - name: Archive-darwin-arm64
         run: tar -czvf dist/versifyr-darwin-arm64.tar.gz dist/darwin-arm64/versifyr
 
-      - name: Build-darwin-arm64
+      - name: Build-darwin-amd64
         run: GOOS=darwin GOARCH=amd64 go build -v -o dist/darwin-amd64/versifyr github.com/zukrin/versifyr/cmd/versifyr
       - name: Archive-darwin-amd64
         run: tar -czvf dist/versifyr-darwin-amd64.tar.gz dist/darwin-amd64/versifyr
@@ -87,24 +56,16 @@ jobs:
         run: echo "version=$(./dist/darwin-arm64/versifyr --version)" >> $GITHUB_OUTPUT
         id: version
 
-
       - name: Update CHANGELOG
         id: changelog
-        uses: requarks/changelog-action@6d71e098526ee17bae963f058d34cd763378337f # v1
+        uses: requarks/changelog-action@2457497103239a5f458564e963b610c3f58a36c8 # v1.1.0
         with:
           token: ${{ github.token }}
           tag: ${{ github.ref_name }}
           writeToFile: true
 
-      # - name: Commit CHANGELOG.md
-      #   uses: stefanzweifel/git-auto-commit-action@v4
-      #   with:
-      #     branch: main
-      #     commit_message: 'docs: update CHANGELOG.md for ${{ github.ref_name }} [skip ci]'
-      #     file_pattern: CHANGELOG.md
-  
       - name: release
-        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1
+        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
         id: create_release
         with:
           draft: false
@@ -115,9 +76,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-
       - name: upload linux artifact
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
+        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -125,8 +85,9 @@ jobs:
           asset_path: ./dist/versifyr-linux-amd64.tar.gz
           asset_name: versifyr-linux-amd64.tar.gz
           asset_content_type: application/gzip
+
       - name: upload darwin artifact
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
+        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -134,8 +95,9 @@ jobs:
           asset_path: ./dist/versifyr-darwin-amd64.tar.gz
           asset_name: versifyr-darwin-amd64.tar.gz
           asset_content_type: application/gzip
+
       - name: upload darwin arm artifact
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
+        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -143,4 +105,3 @@ jobs:
           asset_path: ./dist/versifyr-darwin-arm64.tar.gz
           asset_name: versifyr-darwin-arm64.tar.gz
           asset_content_type: application/gzip
-    
