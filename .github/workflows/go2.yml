@@ -16,11 +16,22 @@ jobs:
         go-version: [ '1.23' ]
 
     steps:
-      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Socket Security (Action)
+        uses: SocketDev/action@ba6de6cc0565af1f42295590380973573297e31f # v1.3.2
+        with:
+          mode: firewall-free
+
+      - name: Secure Go dependencies
+        run: sfw go mod download
+
       - name: Setup Go ${{ matrix.go-version }}
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
           go-version: ${{ matrix.go-version }}
+
       # You can test your matrix by printing the current Go version
       - name: Display Go version
         run: go version
@@ -53,7 +64,7 @@ jobs:
 
       - name: Update CHANGELOG
         id: changelog
-        uses: requarks/changelog-action@v1
+        uses: requarks/changelog-action@6d71e098526ee17bae963f058d34cd763378337f # v1
         with:
           token: ${{ github.token }}
           tag: ${{ github.ref_name }}
@@ -67,7 +78,7 @@ jobs:
       #     file_pattern: CHANGELOG.md
   
       - name: release
-        uses: actions/create-release@v1
+        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1
         id: create_release
         with:
           draft: false
@@ -80,7 +91,7 @@ jobs:
 
 
       - name: upload linux artifact
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -89,7 +100,7 @@ jobs:
           asset_name: versifyr-linux-amd64.tar.gz
           asset_content_type: application/gzip
       - name: upload darwin artifact
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -98,7 +109,7 @@ jobs:
           asset_name: versifyr-darwin-amd64.tar.gz
           asset_content_type: application/gzip
       - name: upload darwin arm artifact
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
