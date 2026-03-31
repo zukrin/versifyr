@@ -18,6 +18,11 @@ tasks:
       - go install github.com/vladopajic/go-test-coverage/v2@v2.18.4
       - go-test-coverage --config .testcoverage.yml
 
+  lint:
+    desc: Run golangci-lint (v1.64.5)
+    cmds:
+      - go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.5 run ./...
+
   build:
     desc: Build the versifyr executable for local platform
     cmds:

@@ -82,7 +82,7 @@ files:
     type: go
     path: version.go
 `
-	os.WriteFile(confFile, []byte(customConfig), 0644)
+	_ = os.WriteFile(confFile, []byte(customConfig), 0644)
 
 	// 3. Run Show (mostly to see if it doesn't crash)
 	err = app.Run([]string{"versifyr-test", "show"})
@@ -107,8 +107,8 @@ func TestCLIWorkflowErrors(t *testing.T) {
 	tmpDir, _ := os.MkdirTemp("", "versifyr-errors-*")
 	defer os.RemoveAll(tmpDir)
 	oldWd, _ := os.Getwd()
-	os.Chdir(tmpDir)
-	defer os.Chdir(oldWd)
+	_ = os.Chdir(tmpDir)
+	defer func() { _ = os.Chdir(oldWd) }()
 
 	app := &cli.App{
 		Metadata: map[string]interface{}{
