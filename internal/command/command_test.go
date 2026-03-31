@@ -102,3 +102,35 @@ files:
 		t.Errorf("file was not updated correctly. Got:\n%s", string(updatedContent))
 	}
 }
+
+func TestCLIWorkflowErrors(t *testing.T) {
+	tmpDir, _ := os.MkdirTemp("", "versifyr-errors-*")
+	defer os.RemoveAll(tmpDir)
+	oldWd, _ := os.Getwd()
+	os.Chdir(tmpDir)
+	defer os.Chdir(oldWd)
+
+	app := &cli.App{
+		Metadata: map[string]interface{}{
+			"config": &configuration.Config{BasePath: ".versifyr"},
+			"logger": logging.NewLogger(),
+		},
+		Commands: []*cli.Command{InitCommand, SetCommand},
+	}
+
+	// 1. Init when folder exists
+	os.Mkdir(".versifyr", 0755)
+	if err := app.Run([]string{"versifyr-test", "init"}); err == nil {
+		t.Error("init should fail when .versifyr exists")
+	}
+
+	// 2. Set with no args
+	if err := app.Run([]string{"versifyr-test", "set"}); err == nil {
+		t.Error("set should fail with no args")
+	}
+
+	// 3. Set with malformed arg
+	if err := app.Run([]string{"versifyr-test", "set", "malformed"}); err == nil {
+		t.Error("set should fail with malformed arg")
+	}
+}

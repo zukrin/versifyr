@@ -64,7 +64,7 @@ func doSet(cCtx *cli.Context) error {
 	}
 
 	// set default values
-	dictionary = setWellKnownValues(dictionary)
+	dictionary = SetWellKnownValues(dictionary)
 	logger.Debug("using values %v", dictionary)
 
 	setFiles := make([]*configuration.ConfigFile, 0)
@@ -140,10 +140,10 @@ func doSet(cCtx *cli.Context) error {
 	return err
 }
 
-func setWellKnownValues(dictionary map[string]string) map[string]string {
+func SetWellKnownValues(dictionary map[string]string) map[string]string {
 
 	// set latest tag
-	latest, err := getGitLatestTag()
+	latest, err := GetGitLatestTag()
 	if err != nil {
 		latest = "unknown"
 	}
@@ -162,7 +162,7 @@ func setWellKnownValues(dictionary map[string]string) map[string]string {
 
 }
 
-func getGitLatestTag() (string, error) {
+func GetGitLatestTag() (string, error) {
 	gitRepo, err := git.PlainOpen(".")
 	if err != nil {
 		return "", err
@@ -187,7 +187,7 @@ func getGitLatestTag() (string, error) {
 		return "", err
 	}
 
-	sort.Sort(byVersion(versions))
+	sort.Sort(ByVersion(versions))
 	if len(versions) > 0 {
 		return versions[len(versions)-1], nil
 	} else {
@@ -195,17 +195,17 @@ func getGitLatestTag() (string, error) {
 	}
 }
 
-type byVersion []string
+type ByVersion []string
 
-func (s byVersion) Len() int {
+func (s ByVersion) Len() int {
 	return len(s)
 }
 
-func (s byVersion) Swap(i, j int) {
+func (s ByVersion) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 
-func (s byVersion) Less(i, j int) bool {
+func (s ByVersion) Less(i, j int) bool {
 	v1, err := version.NewVersion(s[i])
 	if err != nil {
 		panic(err)

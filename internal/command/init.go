@@ -31,8 +31,8 @@ func doInit(cCtx *cli.Context) error {
 	// check if exists
 	_, err := os.Stat(cfg.BasePath)
 	if err == nil {
-		logger.Error("Esisting folder %s", cfg.BasePath)
-		return err
+		logger.Error("Existing folder %s", cfg.BasePath)
+		return os.ErrExist
 	}
 
 	// create if not
