@@ -105,10 +105,9 @@ jobs:
         id: version
 
       - name: Generate Changelog
-        uses: github-changelog-generator/github-changelog-generator@38df9c420a1d6fd0a1f78d9339c790cb29ee6678 # v1.16.4
+        uses: janheinrichmerker/action-github-changelog-generator@e60b5a2bd9fcd88dadf6345ff8327863fb8b490f # v2.4
         with:
           token: ${{ github.token }}
-          latestTag: ${{ github.ref_name }}
 
       - name: release
         uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
