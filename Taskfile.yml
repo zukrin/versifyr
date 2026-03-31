@@ -27,8 +27,9 @@ tasks:
   advance-version:
     desc: Advance project version using versifyr CLI. Usage task advance-version [VERSION=v1.2.3]
     vars:
-      NEXT_VERSION: '{{.VERSION | default (shell "./dist/versifyr show | grep version | awk \"{print \\$2}\" | awk -F. \"{\\$NF+=1; OFS=\\\".\\\"; print \\$0}\"")}}'
-
+      CALCULATED_VERSION:
+        sh: ./dist/versifyr show | grep version | awk '{print $2}' | awk -F. '{$NF+=1; OFS="."; print $0}'
+      NEXT_VERSION: '{{.VERSION | default .CALCULATED_VERSION}}'
     cmds:
       - ./dist/versifyr set version={{.NEXT_VERSION}}
 
