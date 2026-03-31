@@ -1,0 +1,31 @@
+
+version: '3'
+tasks:
+  clean:
+    desc: Remove build artifacts and temporary files
+    cmds:
+      - rm -rf dist/
+
+  test:
+    desc: Run Go tests with coverage
+    cmds:
+      - go test -v ./... -coverprofile=coverage.out
+
+  test-coverage:
+    desc: Run tests and check coverage using go-test-coverage
+    deps: [test]
+    cmds:
+      - go install github.com/vladopajic/go-test-coverage/v2@latest
+      - go-test-coverage --config .testcoverage.yml
+
+  build:
+    desc: Build the versifyr executable for local platform
+    cmds:
+      - mkdir -p dist
+      - go build -v -o dist/versifyr ./cmd/versifyr
+
+  advance-version:
+    desc: Advance project version using versifyr CLI
+    cmds:
+      - ./dist/versifyr set version=$(versifyr show | grep version | awk '{print $2}' | awk -F. '{$NF+=1; OFS="."; print $0}')
+

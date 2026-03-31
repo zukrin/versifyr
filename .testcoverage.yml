@@ -1,0 +1,21 @@
+# go-test-coverage configuration
+
+# Path to coverage profile
+profile: coverage.out
+
+# Thresholds for coverage (percentage)
+threshold:
+  # Minimum total coverage
+  total: 70
+  # Minimum coverage per package
+  package: 50
+  # Minimum coverage per file
+  file: 30
+
+# Hold status for coverage breakdown
+# breakdown-file-name: .testcoverage.breakdown
+
+# Exclude files or packages from coverage
+exclude:
+  paths:
+    - cmd/versifyr/versifyr.go # Entry point, mostly boilerplate

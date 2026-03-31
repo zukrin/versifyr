@@ -1,4 +1,5 @@
 [![Go](https://github.com/zukrin/versifyr/actions/workflows/go2.yml/badge.svg)](https://github.com/zukrin/versifyr/actions/workflows/go2.yml)
+![Go Test Coverage](https://img.shields.io/badge/coverage-80.4%25-brightgreen)
 
 # versifyr
 
