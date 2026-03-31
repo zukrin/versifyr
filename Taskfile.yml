@@ -25,7 +25,10 @@ tasks:
       - go build -v -o dist/versifyr ./cmd/versifyr
 
   advance-version:
-    desc: Advance project version using versifyr CLI
+    desc: Advance project version using versifyr CLI. Usage task advance-version [VERSION=v1.2.3]
+    vars:
+      NEXT_VERSION: '{{.VERSION | default (shell "./dist/versifyr show | grep version | awk \"{print \\$2}\" | awk -F. \"{\\$NF+=1; OFS=\\\".\\\"; print \\$0}\"")}}'
+
     cmds:
-      - ./dist/versifyr set version=$(versifyr show | grep version | awk '{print $2}' | awk -F. '{$NF+=1; OFS="."; print $0}')
+      - ./dist/versifyr set version={{.NEXT_VERSION}}
 
