@@ -24,7 +24,7 @@ jobs:
         run: go test ./... -coverprofile=coverage.out
 
       - name: check test coverage
-        uses: vladopajic/go-test-coverage@21669785168019a71df542be7e008d3e913a0f12 # v2.12.3
+        uses: vladopajic/go-test-coverage@f190f667e23b4441202d0bab0f8c2e7bce8925b6 # v2.18.4
         with:
           config: .testcoverage.yml
           git-token: ${{ github.token }}
