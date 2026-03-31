@@ -60,19 +60,19 @@ func NewLogger() *Logger {
 
 func (l *Logger) Debug(template string, args ...interface{}) {
 	if Debug >= l.LogLevel {
-		pterm.ThemeDefault.DebugMessageStyle.Printfln(template, args...)
+		pterm.ThemeDefault.DebugMessageStyle.Printf(template, args...)
 	}
 }
 
 func (l *Logger) Info(template string, args ...interface{}) {
 	if Info >= l.LogLevel {
-		pterm.ThemeDefault.InfoMessageStyle.Printfln(template, args...)
+		pterm.ThemeDefault.InfoMessageStyle.Printf(template, args...)
 	}
 }
 
 func (l *Logger) Error(template string, args ...interface{}) {
 	if Error >= l.LogLevel {
-		pterm.ThemeDefault.ErrorMessageStyle.Printfln(template, args...)
+		pterm.ThemeDefault.ErrorMessageStyle.Printf(template, args...)
 	}
 }
 
@@ -81,7 +81,7 @@ type debugWriter struct {
 }
 
 func (dw *debugWriter) Write(p []byte) (n int, err error) {
-	pterm.ThemeDefault.DebugMessageStyle.Printf(string(p))
+	pterm.ThemeDefault.DebugMessageStyle.Printf("%s", string(p))
 	return len(p), nil
 }
 
@@ -90,7 +90,7 @@ type infoWriter struct {
 }
 
 func (iw *infoWriter) Write(p []byte) (n int, err error) {
-	pterm.ThemeDefault.InfoMessageStyle.Printf(string(p))
+	pterm.ThemeDefault.InfoMessageStyle.Printf("%s", string(p))
 	return len(p), nil
 }
 
@@ -99,6 +99,6 @@ type errWriter struct {
 }
 
 func (iw *errWriter) Write(p []byte) (n int, err error) {
-	pterm.ThemeDefault.ErrorMessageStyle.Printf(string(p))
+	pterm.ThemeDefault.ErrorMessageStyle.Printf("%s", string(p))
 	return len(p), nil
 }

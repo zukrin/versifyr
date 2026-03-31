@@ -39,7 +39,7 @@ func doShow(cCtx *cli.Context) error {
 	}
 
 	result := markdown.Render(newlineSW.String(), 132, 6)
-	logger.Info(string(result))
+	logger.Info("%s", string(result))
 
 	return nil
 }

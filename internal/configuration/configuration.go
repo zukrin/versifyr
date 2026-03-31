@@ -1,6 +1,7 @@
 package configuration
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"strconv"
@@ -90,6 +91,22 @@ func (c *ConfigFile) String() string {
 	res += "\t]\n"
 	res += "}"
 	return res
+}
+
+func (f *ConfigFile) ApplyTemplates(dictionary map[string]string) error {
+	for _, p := range f.Placeholders {
+		newlineSW := new(bytes.Buffer)
+		err := p.Template.Execute(newlineSW, dictionary)
+		if err != nil {
+			return err
+		}
+		newline := newlineSW.String()
+		if f.Unescape {
+			newline = strings.ReplaceAll(newline, "\\\"", "\"")
+		}
+		f.Lines[p.Line] = newline
+	}
+	return nil
 }
 
 // Config is the configuration structure for the application.
