@@ -1,234 +1,132 @@
+# versifyr
+
 [![CI](https://github.com/zukrin/versifyr/actions/workflows/pipeline.yml/badge.svg)](https://github.com/zukrin/versifyr/actions/workflows/pipeline.yml)
 [![Latest Release](https://img.shields.io/github/v/release/zukrin/versifyr)](https://github.com/zukrin/versifyr/releases)
 ![Go Test Coverage](https://img.shields.io/badge/coverage-80.4%25-brightgreen)
 
-# versifyr
+`versifyr` is a specialized CLI tool designed to synchronize project versions across multiple files. It supports various formats (Go, YAML, XML, Java, JSON, etc.) by using powerful Go templates and Sprig functions to ensure consistency across your entire codebase.
 
-Some times we need to manage the version of a project in many files. This tool can set the version of a project in project files.
+Whether you need to update a Helm chart, a Maven `pom.xml`, or a Go constant, `versifyr` automates the process through a single command.
 
-Versifyr allows to set values as defined from key=value pairs passed at command line.
+## Core Features
 
-Files to be managed are listed in the configuration file `.versifyr/configuration.yaml` in the root of the project:
+- **Format Agnostic**: Works with any text-based file format.
+- **Template Driven**: Uses standard Go `text/template` syntax.
+- **Extensible**: Includes [Sprig functions](http://masterminds.github.io/sprig/) for complex string manipulations.
+- **Flexible Configuration**: Define templates directly in source comments or in a central YAML configuration.
+- **Context Aware**: Automatically provides values like `latesttag`, `actualdate`, and `actualtimestamp`.
 
-```yaml
+## Installation
 
-files:
-  - name: chart.yaml
-    type: yaml
-    path: chart/Chart.yaml
-  - name: pom.xml
-    type: xml
-    path: pom.xml
-  - name: Version.java
-    type: java
-    path: src/main/java/sample/Version.java
-
+```sh
+go install github.com/zukrin/versifyr/cmd/versifyr@latest
 ```
 
-The path is relative to the root of the project. Each file may contain well commented lines to identify the version to be managed
-in the form `$versifyr:template=<template>$`. The template will replace the followin line:
+## Getting Started
 
-```yaml
+### 1. Initialize Configuration
+Run the following command to create a default `.versifyr/configuration.yaml` in your project root:
 
-apiVersion: v2
-name: orchestrator
-description: A Helm chart for Kubernetes
-
-# A chart can be either an 'application' or a 'library' chart.
-#
-# Application charts are a collection of templates that can be packaged into versioned archives
-# to be deployed.
-#
-# Library charts provide useful utilities or functions for the chart developer. They're included as
-# a dependency of application charts to inject those utilities and functions into the rendering
-# pipeline. Library charts do not define any templates and therefore cannot be deployed.
-type: application
-
-# This is the chart version. This version number should be incremented each time you make changes
-# to the chart and its templates, including the app version.
-# Versions are expected to follow Semantic Versioning (https://semver.org/)
-# $versifyr:template=version: {{.version}}$
-version: 4.0.1
-
-# This is the version number of the application being deployed. This version number should be
-# incremented each time you make changes to the application. Versions are not expected to
-# follow Semantic Versioning. They should reflect the version the application is using.
-# $versifyr:template=appVersion: {{.version}}$
-appVersion: 4.0.1
-
+```sh
+versifyr init
 ```
 
-From version `0.0.11` `versifyer` can handle target rows and template definition inside configuration as follows:
+### 2. Define Your Templates
+You can define what needs to be updated in two ways:
+
+#### Option A: Embedded in Source (Recommended)
+Add a comment directly above the line you want to manage. The tool will replace the **immediately following line** with the result of your template.
+
+**Go Example:**
+```go
+// $versifyr:template=const Version = "{{ .version }}"$
+const Version = "v0.0.0"
+```
+
+**Maven Example (XML):**
+```xml
+<!--$versifyr:template=<version>{{ .version }}</version>$-->
+<version>1.0.0-SNAPSHOT</version>
+```
+
+#### Option B: Centralized in Configuration
+If you cannot add comments to a file, define the target row and template in `.versifyr/configuration.yaml`:
 
 ```yaml
-
-#debug: true
 files:
   - name: version.go
     type: go
     path: internal/versifyr/version.go
     templates:
       - row: 3
-        template: const Version = "{{ .version }}"
-      - row: 5
-        template: const Sample = "{{ .sample }}"
-      - row: 7
-        template: const ActualTimestamp = "{{ .version | replace "." "_" }}"
-      - row: 9
-        template: const Compiled = "{{ .actualtimestamp }}"
+        template: 'const Version = "{{ .version }}"'
 ```
 
-This cam be useful when the target file syntax douesn't support comments (i.e text files). But... mind the row number!
-The two configuration are equivalent and can be mixed.
-
-Files can be any text file. `versifyr` can set any value passed at command line.
-
-Some values are always available:
-
-`actualdate`: es. 2023-05-22 
-`actualtime`: es. 16:15:57 
-`actualtimestamp`: es. 2023-05-22 16:15:57 
-`latesttag`: es. 4.0.1, in case of git repository
-
-
-Se examples in `examples` folder.
-
-Usage
+### 3. Apply Changes
+Update your files by passing key-value pairs:
 
 ```sh
-
-NAME:
-   versifyr - A new cli application
-
-USAGE:
-   versifyr [global options] command [command options] [arguments...]
-
-VERSION:
-   0.1.0
-
-AUTHOR:
-   Stefano Zuccaro <zukrin@gmail.com>
-
-COMMANDS:
-   init, i  init project configuration
-   show, s  show actual configuration and file content
-   set, s   set values as key=value to be replaced in files
-   help, h  Shows a list of commands or help for one command
-
-GLOBAL OPTIONS:
-   --debug, -d     set output to debug (default: false)
-   --nochange, -n  simulate changes (default: false)
-   --help, -h      show help
-   --version, -v   print the version
-
-COPYRIGHT:
-   (c) 2023 Stefano Zuccaro
-
-
+versifyr set version="v1.2.3"
 ```
+
+## Built-in Variables
+
+The following variables are always available in your templates:
+
+- `version`: The primary value usually passed via CLI.
+- `latesttag`: The most recent Git tag (e.g., `v0.1.0`).
+- `actualdate`: Current date (YYYY-MM-DD).
+- `actualtime`: Current time (HH:MM:SS).
+- `actualtimestamp`: Current date and time.
+
+## Advanced Usage
+
+### Sprig Functions
+You can use any Sprig function for transformations. For example, to generate a snake_case version for a constant:
+
+```go
+// $versifyr:template=const BUILD_ID = "{{ .version | replace "." "_" }}"$
+const BUILD_ID = "v0_1_0"
+```
+
+### Escaping Quotes (JSON)
+For formats like JSON where quotes must be escaped, use the `unescape` flag in your configuration:
+
+```yaml
+files:
+  - name: package.json
+    path: package.json
+    type: json
+    unescape: true
+```
+
+## Commands
+
+| Command | Alias | Description |
+| :--- | :--- | :--- |
+| `init` | `i` | Creates the initial `.versifyr/configuration.yaml`. |
+| `show` | `s` | Displays the current configuration and managed file content. |
+| `set` | | Executes template replacements based on provided arguments. |
+
+**Global Options:**
+- `--debug`, `-d`: Enable verbose logging.
+- `--nochange`, `-n`: Run in simulation mode (dry-run).
 
 ## Development
 
-`versifyr` uses [Taskfile](https://taskfile.dev/) to manage development tasks.
+`versifyr` uses [Taskfile](https://taskfile.dev/) for a streamlined development experience.
 
-### Tasks
+### Local Tasks
+- **Lint**: `task lint` - Runs `golangci-lint` exactly as it runs in CI.
+- **Test**: `task test` - Runs the full test suite with coverage reporting.
+- **Check Coverage**: `task test-coverage` - Verifies coverage against defined thresholds.
+- **Advance Version**: `task advance-version [VERSION=vX.Y.Z]` - Increments the patch version from the latest Git tag.
 
-- **Clean**: `task clean` - Remove build artifacts.
-- **Test**: `task test` - Run Go tests and generate coverage profile.
-- **Lint**: `task lint` - Run `golangci-lint` (v1.64.5) locally.
-- **Coverage**: `task test-coverage` - Run tests and check coverage against thresholds using `go-test-coverage`.
-- **Build**: `task build` - Build the `versifyr` executable for the local platform.
-- **Advance Version**: `task advance-version [VERSION=vX.Y.Z]` - Automatically increments the patch version from the latest git tag, or sets a specific version if provided.
+### CI/CD Pipeline
+Every push and pull request to `main` triggers a comprehensive pipeline:
+1. **Linting**: Static analysis with `golangci-lint`.
+2. **Testing**: Unit and integration tests with coverage enforcement.
+3. **Release**: Automated multi-arch builds and GitHub Release creation (triggered on version tags).
 
-### CI/CD
-
-The project uses GitHub Actions for:
-- **CI**: Runs tests and coverage checks on every push and pull request to `main`.
-- **Lint**: Runs `golangci-lint` on every push and pull request.
-- **Release**: Automatically builds multi-arch binaries and creates a GitHub Release when a new tag `v*.*.*` is pushed.
-
-## installation
-
-```sh
-go install -v github.com/zukrin/versifyr/cmd/versifyr@latest
-```
-
-## init
-
-Use `versifyr init` to create the configuration file `.versifyr/configuration.json` in the root of the project
-
-## show
-
-Use `versifyr show` to show the actual configuration and the file content:
-
-```sh
-versifyr show
-      1 actual situation
-      ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-
-      1.1 version.go
-
-      ┃ package versifyr
-      ┃ 
-      ┃ // $versifyr:template=const Version = "{{ .version }}"$
-      ┃ const Version = "v0.0.1"
-      ┃ 
-      ┃ // $versifyr:template=const Sample = "{{ .sample }}"$
-      ┃ const Sample = "something"
-      ┃ 
-      ┃ // $versifyr:template=const Compiled = "{{ .actualtimestamp }}"$
-      ┃ const Compiled = "2023-05-23 10:29:22"
-
-```
-
-## set
-
-Use `versifyr set` to set values as key=value to be replaced in files. Use the option `-n` to simulate changes.
-
-```sh
-
-versifyr -n set version="v0.0.1" sample="something" 
-setting values
-using values map[actualdate:2023-05-23 actualtime:10:28:58 actualtimestamp:2023-05-23 10:28:58 latesttag:unknown sample:something version:v0.0.1]
-replaced into version.go line 3 with const Version = "v0.0.1"
-replaced into version.go line 6 with const Sample = "something"
-replaced into version.go line 9 with const Compiled = "2023-05-23 10:28:58"
-      1 transformed files
-      ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-
-      1.1 version.go
-
-      ┃ package versifyr
-      ┃ 
-      ┃ // $versifyr:template=const Version = "{{ .version }}"$
-      ┃ const Version = "v0.0.1"
-      ┃ 
-      ┃ // $versifyr:template=const Sample = "{{ .sample }}"$
-      ┃ const Sample = "something"
-      ┃ 
-      ┃ // $versifyr:template=const Compiled = "{{ .actualtimestamp }}"$
-      ┃ const Compiled = "2023-05-23 10:28:58"
-
-
-```
-
-
-
-> When quote in templates must be escaped (i.e in json), use the configuration `unescape: true` flag (default: `false`). I.e:
-> 
- 
-  ```yaml
-
-   files:
-   - name: package.json
-      type: json
-      path: package.json
-      unescape: true
-
-  ```
-
-Versifyr supports sprig functions inside templates. See [sprig](http://masterminds.github.io/sprig/). I.e:
-
-```go
-const ActualTimestamp = "{{ .version | replace "." "_" }}"
-```
+## License
+(c) 2023-2026 Stefano Zuccaro. All rights reserved.
