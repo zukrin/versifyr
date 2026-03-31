@@ -62,7 +62,6 @@ jobs:
         with:
           token: ${{ github.token }}
           tag: ${{ github.ref_name }}
-          writeToFile: true
 
       - name: release
         uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
@@ -72,7 +71,7 @@ jobs:
           prerelease: false
           release_name: ${{ steps.version.outputs.version }}
           tag_name: ${{ github.ref }}
-          body_path: CHANGELOG.md
+          body: ${{ steps.changelog.outputs.changelog }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
@@ -104,4 +103,6 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./dist/versifyr-darwin-arm64.tar.gz
           asset_name: versifyr-darwin-arm64.tar.gz
+          asset_content_type: application/gzip
+darwin-arm64.tar.gz
           asset_content_type: application/gzip
