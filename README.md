@@ -105,7 +105,7 @@ USAGE:
    versifyr [global options] command [command options] [arguments...]
 
 VERSION:
-   2.0.1
+   0.1.0
 
 AUTHOR:
    Stefano Zuccaro <zukrin@gmail.com>
@@ -127,6 +127,26 @@ COPYRIGHT:
 
 
 ```
+
+## Development
+
+`versifyr` uses [Taskfile](https://taskfile.dev/) to manage development tasks.
+
+### Tasks
+
+- **Clean**: `task clean` - Remove build artifacts.
+- **Test**: `task test` - Run Go tests and generate coverage profile.
+- **Lint**: `task lint` - Run `golangci-lint` (v1.64.5) locally.
+- **Coverage**: `task test-coverage` - Run tests and check coverage against thresholds using `go-test-coverage`.
+- **Build**: `task build` - Build the `versifyr` executable for the local platform.
+- **Advance Version**: `task advance-version [VERSION=vX.Y.Z]` - Automatically increments the patch version from the latest git tag, or sets a specific version if provided.
+
+### CI/CD
+
+The project uses GitHub Actions for:
+- **CI**: Runs tests and coverage checks on every push and pull request to `main`.
+- **Lint**: Runs `golangci-lint` on every push and pull request.
+- **Release**: Automatically builds multi-arch binaries and creates a GitHub Release when a new tag `v*.*.*` is pushed.
 
 ## installation
 
