@@ -19,8 +19,8 @@ func TestCLIWorkflow(t *testing.T) {
 	defer os.RemoveAll(tmpDir)
 
 	oldWd, _ := os.Getwd()
-	os.Chdir(tmpDir)
-	defer os.Chdir(oldWd)
+	_ = os.Chdir(tmpDir)
+	defer func() { _ = os.Chdir(oldWd) }()
 
 	// Setup App (similar to main.go but for testing)
 	cfg := &configuration.Config{}
@@ -47,8 +47,8 @@ func TestCLIWorkflow(t *testing.T) {
 
 			// Only try to load config if it exists
 			if _, err := os.Stat(bp + "/" + configuration.CONFIG_FILENAME); err == nil {
-				configuration.NewConfig(cfg)
-				cfg.CompilePatterns(logger)
+				_ = configuration.NewConfig(cfg)
+				_, _ = cfg.CompilePatterns(logger)
 			}
 			return nil
 		},
@@ -71,7 +71,7 @@ func TestCLIWorkflow(t *testing.T) {
 // $versifyr:template=const Version = "{{ .version }}"$
 const Version = "v0.0.0"
 `
-	os.WriteFile(testFile, []byte(testContent), 0644)
+	_ = os.WriteFile(testFile, []byte(testContent), 0644)
 
 	// Update configuration to include this file
 	// Actually, the default configuration created by init includes version.go in internal/versifyr/version.go
@@ -132,8 +132,5 @@ func TestCLIWorkflowErrors(t *testing.T) {
 	// 3. Set with malformed arg
 	if err := app.Run([]string{"versifyr-test", "set", "malformed"}); err == nil {
 		t.Error("set should fail with malformed arg")
-	}
-}
-)
 	}
 }

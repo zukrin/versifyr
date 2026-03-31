@@ -51,8 +51,8 @@ files:
 
 	// Change working directory to tmpDir to test NewConfig
 	oldWd, _ := os.Getwd()
-	os.Chdir(tmpDir)
-	defer os.Chdir(oldWd)
+	_ = os.Chdir(tmpDir)
+	defer func() { _ = os.Chdir(oldWd) }()
 
 	cfg := &Config{}
 	err = NewConfig(cfg)
@@ -333,7 +333,7 @@ func TestConfigErrorPaths(t *testing.T) {
 
 	// CompilePatterns invalid template syntax
 	fPath2 := filepath.Join(tmpDir, "invalid.go")
-	os.WriteFile(fPath2, []byte("// $versifyr:template={{ .v | invalid }}$\nconst V = 1"), 0644)
+	_ = os.WriteFile(fPath2, []byte("// $versifyr:template={{ .v | invalid }}$\nconst V = 1"), 0644)
 	cfgInvalid := &Config{
 		Files: []*ConfigFile{
 			{Path: fPath2, Name: "invalid.go"},
@@ -341,8 +341,5 @@ func TestConfigErrorPaths(t *testing.T) {
 	}
 	if _, err := cfgInvalid.CompilePatterns(logger); err == nil {
 		t.Error("CompilePatterns should fail for invalid template syntax")
-	}
-}
-te syntax")
 	}
 }
