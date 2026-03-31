@@ -1,5 +1,4 @@
-[![Go](https://github.com/zukrin/versifyr/actions/workflows/ci.yml/badge.svg)](https://github.com/zukrin/versifyr/actions/workflows/ci.yml)
-[![Lint](https://github.com/zukrin/versifyr/actions/workflows/lint.yml/badge.svg)](https://github.com/zukrin/versifyr/actions/workflows/lint.yml)
+[![CI](https://github.com/zukrin/versifyr/actions/workflows/pipeline.yml/badge.svg)](https://github.com/zukrin/versifyr/actions/workflows/pipeline.yml)
 [![Latest Release](https://img.shields.io/github/v/release/zukrin/versifyr)](https://github.com/zukrin/versifyr/releases)
 ![Go Test Coverage](https://img.shields.io/badge/coverage-80.4%25-brightgreen)
 
