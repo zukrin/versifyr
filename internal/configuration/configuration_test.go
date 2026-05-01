@@ -12,15 +12,15 @@ import (
 
 func TestGetBasePath(t *testing.T) {
 	// Test default
-	os.Unsetenv(BASEPATH_ENV)
+	_ = os.Unsetenv(BASEPATH_ENV)
 	if bp := GetBasePath(); bp != BASEPATH_DEFAULT {
 		t.Errorf("expected default %s, got %s", BASEPATH_DEFAULT, bp)
 	}
 
 	// Test env override
 	expected := "custom-path"
-	os.Setenv(BASEPATH_ENV, expected)
-	defer os.Unsetenv(BASEPATH_ENV)
+	_ = os.Setenv(BASEPATH_ENV, expected)
+	defer func() { _ = os.Unsetenv(BASEPATH_ENV) }()
 	if bp := GetBasePath(); bp != expected {
 		t.Errorf("expected custom %s, got %s", expected, bp)
 	}
@@ -31,7 +31,7 @@ func TestNewConfig(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	confDir := filepath.Join(tmpDir, BASEPATH_DEFAULT)
 	if err := os.Mkdir(confDir, 0755); err != nil {
@@ -73,7 +73,7 @@ func TestCompilePatternsEmbedded(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	testFilePath := filepath.Join(tmpDir, "version.go")
 	testFileContent := `package main
@@ -118,7 +118,7 @@ func TestCompilePatternsExplicit(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	testFilePath := filepath.Join(tmpDir, "version.go")
 	testFileContent := `package main
@@ -263,7 +263,7 @@ func TestCreateConfiguration(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	logger := logging.NewLogger()
 	
@@ -300,12 +300,12 @@ func TestConfigErrorPaths(t *testing.T) {
 	logger := logging.NewLogger()
 
 	// NewConfig non-existent
-	os.Setenv(BASEPATH_ENV, "/non/existent/path")
+	_ = os.Setenv(BASEPATH_ENV, "/non/existent/path")
 	cfg := &Config{}
 	if err := NewConfig(cfg); err == nil {
 		t.Error("NewConfig should fail for non-existent path")
 	}
-	os.Unsetenv(BASEPATH_ENV)
+	_ = os.Unsetenv(BASEPATH_ENV)
 
 	// CompilePatterns non-existent file
 	cfgErr := &Config{
@@ -319,7 +319,7 @@ func TestConfigErrorPaths(t *testing.T) {
 
 	// CompilePatterns unclosed template
 	tmpDir, _ := os.MkdirTemp("", "versifyr-err-*")
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 	fPath := filepath.Join(tmpDir, "unclosed.go")
 	_ = os.WriteFile(fPath, []byte("// $versifyr:template={{ .v }}\nconst V = 1"), 0644)
 	cfgUnclosed := &Config{

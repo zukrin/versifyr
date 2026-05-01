@@ -192,7 +192,11 @@ func (cfg *Config) CreateConfiguration(logger *logging.Logger) error {
 		if err != nil {
 			return err
 		}
-		defer fl.Close()
+		defer func() {
+			if cerr := fl.Close(); cerr != nil {
+				logger.Error("error closing configuration file: %v", cerr)
+			}
+		}()
 
 		_, err = fl.WriteString(SAMPLE_CONFIG)
 		return err

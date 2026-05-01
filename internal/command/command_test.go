@@ -16,7 +16,7 @@ func TestCLIWorkflow(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	oldWd, _ := os.Getwd()
 	_ = os.Chdir(tmpDir)
@@ -105,7 +105,7 @@ files:
 
 func TestCLIWorkflowErrors(t *testing.T) {
 	tmpDir, _ := os.MkdirTemp("", "versifyr-errors-*")
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 	oldWd, _ := os.Getwd()
 	_ = os.Chdir(tmpDir)
 	defer func() { _ = os.Chdir(oldWd) }()
