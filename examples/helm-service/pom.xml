@@ -50,7 +50,7 @@
 		<dependency>
 			<groupId>com.nimbusds</groupId>
 			<artifactId>nimbus-jose-jwt</artifactId>
-			<version>8.16</version>
+			<version>9.37.4</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-io</groupId>
@@ -61,7 +61,7 @@
 		<dependency>
 			<groupId>io.minio</groupId>
 			<artifactId>minio</artifactId>
-			<version>6.0.8</version>
+			<version>8.6.0</version>
 		</dependency>
 	</dependencies>
 
