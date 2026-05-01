@@ -10,7 +10,7 @@ Versifyr is a CLI tool designed to manage project versions across multiple files
 - **Verification**: A fix is only considered complete when the previously failing test case passes and no regressions are introduced.
 
 ### 2. Version Management
-- **Tool Usage**: Never manually edit version strings in the codebase. You MUST use `versifyr` itself to advance the version.
+- **Tool Usage**: Never manually edit version strings in the codebase. You MUST use `versifyr` itself to advance the version: `./dist/versifyr set version="<new version>" sample="<some evocative short sencence from shi-fi literature" actualtimestamp="<timestamp>"`.
 - **Timing**: The code's internal version must be advanced BEFORE committing and tagging a new release.
 
 ### 3. Commit Standards
