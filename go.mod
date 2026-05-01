@@ -1,6 +1,6 @@
 module github.com/zukrin/versifyr
 
-go 1.25
+go 1.25.0
 
 require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
