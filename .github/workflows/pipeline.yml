@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5.1.0
         with:
-          go-version: '1.23'
+          go-version-file: 'go.mod'
           cache: false
       - name: golangci-lint
         uses: golangci/golangci-lint-action@93b9014e69c7cbab11e3b52b4fa2a439fe736af5 # v6.4.1
@@ -37,7 +37,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5.1.0
         with:
-          go-version: '1.23'
+          go-version: '1.25'
 
       - name: generate test coverage
         run: go test ./... -coverprofile=coverage.out
@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go-version: [ '1.23' ]
+        go-version: [ '1.24' ]
 
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -150,3 +150,4 @@ jobs:
           asset_path: ./dist/versifyr-darwin-arm64.tar.gz
           asset_name: versifyr-darwin-arm64.tar.gz
           asset_content_type: application/gzip
+n/gzip
