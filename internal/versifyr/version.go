@@ -1,13 +1,13 @@
 package versifyr
 
 // $versifyr:template=const Version = "{{ .version }}"$
-const Version = "v0.1.3"
+const Version = "v0.0.17"
 
 // $versifyr:template=const Sample = "{{ .sample }}"$
-const Sample = "The sky above the port was the color of television, tuned to a dead channel."
+const Sample = "I've seen things you people wouldn't believe."
 
 // $versifyr:template=const ActualTimestamp = "{{ .version | replace "." "_" }}"$
-const ActualTimestamp = "v0_1_3"
+const ActualTimestamp = "v0_0_17"
 
 // $versifyr:template=const Compiled = "{{ .actualtimestamp }}"$
-const Compiled = "2026-05-01 17:05:40"
+const Compiled = "2026-05-01 17:18:36"
