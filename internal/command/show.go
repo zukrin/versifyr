@@ -28,12 +28,12 @@ func doShow(cCtx *cli.Context) error {
 	newlineSW := new(bytes.Buffer)
 	newlineSW.WriteString("# actual situation\n")
 	for _, file := range cfg.Files {
-		newlineSW.WriteString(fmt.Sprintf("## %s\n", file.Name))
+		fmt.Fprintf(newlineSW, "## %s\n", file.Name)
 		bytes, err := os.ReadFile(file.Path)
 		if err != nil {
-			newlineSW.WriteString(fmt.Sprintf("> not found, cause %s\n", err.Error()))
+			fmt.Fprintf(newlineSW, "> not found, cause %s\n", err.Error())
 		}
-		newlineSW.WriteString(fmt.Sprintf("```%s\n", file.Type))
+		fmt.Fprintf(newlineSW, "```%s\n", file.Type)
 		newlineSW.Write(bytes)
 		newlineSW.WriteString("\n```\n")
 	}

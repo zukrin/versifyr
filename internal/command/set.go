@@ -100,8 +100,8 @@ func doSet(cCtx *cli.Context) error {
 	reportBuffer.WriteString("# transformed files\n")
 
 	for _, file := range setFiles {
-		reportBuffer.WriteString(fmt.Sprintf("## %s (%v)\n", file.Path, len(file.Lines)))
-		reportBuffer.WriteString(fmt.Sprintf("```%s\n", file.Type))
+		fmt.Fprintf(reportBuffer, "## %s (%v)\n", file.Path, len(file.Lines))
+		fmt.Fprintf(reportBuffer, "```%s\n", file.Type)
 
 		outputBuffer := new(bytes.Buffer)
 		for l, line := range file.Lines {
@@ -118,7 +118,11 @@ func doSet(cCtx *cli.Context) error {
 			if err != nil {
 				return err
 			}
-			defer outFile.Close()
+			defer func() {
+				if cerr := outFile.Close(); cerr != nil {
+					logger.Error("error closing file %s: %v", file.Path, cerr)
+				}
+			}()
 
 			written, err := outFile.Write(outputBuffer.Bytes())
 			if err != nil {
