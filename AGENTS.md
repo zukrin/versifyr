@@ -18,5 +18,6 @@ Versifyr is a CLI tool designed to manage project versions across multiple files
 - **Contextual Detail**: Commits should be contextual, explaining the "why" and referencing specific issues or architectural reasons when applicable.
 
 ### 4. Release Process
+- **Quality Assurance**: You MUST perform linting (e.g., `task lint`) and resolve ALL identified issues before merging a PR and BEFORE tagging a new release.
 - **Automation**: Be aware of CI/CD workflows (e.g., `.github/workflows/go2.yml`). Tagging a release triggers automated builds and artifact generation.
 - **Consistency**: Ensure the internal version matches the Git tag exactly.
