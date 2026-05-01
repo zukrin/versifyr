@@ -74,7 +74,7 @@ jobs:
           mode: firewall-free
 
       - name: Secure Go dependencies
-        run: sfw go mod download
+        run: go mod download
 
       - name: Display Go version
         run: go version
