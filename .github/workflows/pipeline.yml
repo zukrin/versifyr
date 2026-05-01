@@ -150,4 +150,3 @@ jobs:
           asset_path: ./dist/versifyr-darwin-arm64.tar.gz
           asset_name: versifyr-darwin-arm64.tar.gz
           asset_content_type: application/gzip
-n/gzip
