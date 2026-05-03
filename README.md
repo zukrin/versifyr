@@ -3,7 +3,7 @@
 [![CI](https://github.com/zukrin/versifyr/actions/workflows/pipeline.yml/badge.svg)](https://github.com/zukrin/versifyr/actions/workflows/pipeline.yml)
 [![Lint](https://img.shields.io/github/actions/workflow/status/zukrin/versifyr/pipeline.yml?label=lint)](https://github.com/zukrin/versifyr/actions/workflows/pipeline.yml)
 [![Latest Release](https://img.shields.io/github/v/release/zukrin/versifyr)](https://github.com/zukrin/versifyr/releases)
-![Go Test Coverage](https://img.shields.io/badge/coverage-87.9%25-brightgreen)
+![Go Test Coverage](https://raw.githubusercontent.com/zukrin/versifyr/main/.badges/main/coverage.svg)
 
 `versifyr` is a specialized CLI tool designed to synchronize project versions across multiple files. It supports various formats (Go, YAML, XML, Java, JSON, etc.) by using powerful Go templates and Sprig functions to ensure consistency across your entire codebase.
 
