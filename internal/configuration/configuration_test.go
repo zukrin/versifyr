@@ -337,11 +337,7 @@ func TestCreateConfiguration(t *testing.T) {
 	}
 	// Create a directory named configuration.yaml to block file creation
 	_ = os.Mkdir(filepath.Join(blockedPath, CONFIG_FILENAME), 0755)
-	if err := cfgErr2.CreateConfiguration(logger); err == nil {
-		// Wait, CreateConfiguration first tries Mkdir(cfg.BasePath, 0755)
-		// Since blockedPath exists, it might fail or skip.
-		// Mkdir returns error if it exists.
-	}
+	_ = cfgErr2.CreateConfiguration(logger)
 }
 
 func TestConfigErrorPaths(t *testing.T) {

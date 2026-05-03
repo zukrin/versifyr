@@ -171,9 +171,7 @@ func TestCLIWorkflowErrors(t *testing.T) {
 	cfg.Files = []*configuration.ConfigFile{
 		{Name: "readonly", Path: badFile, Lines: []string{"test"}},
 	}
-	if err := app.Run([]string{"versifyr-test", "set", "v=1"}); err == nil {
-		// This might fail because we didn't set up placeholders, so ApplyTemplates does nothing.
-	}
+	_ = app.Run([]string{"versifyr-test", "set", "v=1"})
 }
 
 func TestDoSetApplyError(t *testing.T) {
