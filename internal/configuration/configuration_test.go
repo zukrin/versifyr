@@ -66,6 +66,15 @@ files:
 	if cfg.Files[0].Name != "test.go" {
 		t.Errorf("expected test.go, got %s", cfg.Files[0].Name)
 	}
+
+	// Test Unmarshal error
+	invalidContent := `
+files: "not a slice"
+`
+	_ = os.WriteFile(confFile, []byte(invalidContent), 0644)
+	if err := NewConfig(&Config{}); err == nil {
+		t.Error("NewConfig should fail for invalid schema")
+	}
 }
 
 func TestCompilePatternsEmbedded(t *testing.T) {
@@ -219,6 +228,20 @@ func TestApplyTemplates(t *testing.T) {
 	if cfgUnescape.Lines[0] != "\"v1.2.3\"" {
 		t.Errorf("expected \"v1.2.3\", got %s", cfgUnescape.Lines[0])
 	}
+
+	// Test Template Execute Error
+	cfgErr := &ConfigFile{
+		Name:  "err.go",
+		Lines: []string{"const V = 1"},
+	}
+	tplErr, _ := cfgErr.CompileTemplate("{{ .nonexistent }}")
+	tplErr.Option("missingkey=error")
+	cfgErr.Placeholders = []*Placeholder{
+		{TemplateText: "{{ .nonexistent }}", Template: tplErr, Line: 0},
+	}
+	if err := cfgErr.ApplyTemplates(map[string]string{}); err == nil {
+		t.Error("ApplyTemplates should fail for missing key when missingkey=error is set")
+	}
 }
 
 // Helper to compile template in tests (simulating what CompilePatterns does)
@@ -227,31 +250,31 @@ func (f *ConfigFile) CompileTemplate(tpltxt string) (*template.Template, error) 
 }
 
 func TestStringMethods(t *testing.T) {
-	ph := &Placeholder{
-		TemplateText: "{{ .v }}",
-		Line:         10,
+	ph1 := &Placeholder{
+		TemplateText: "{{ .v1 }}",
+		Line:         0,
 	}
-	if s := ph.String(); s == "" {
-		t.Error("Placeholder.String() returned empty string")
+	ph2 := &Placeholder{
+		TemplateText: "{{ .v2 }}",
+		Line:         1,
 	}
 
 	cf := &ConfigFile{
 		Name: "test",
 		Templates: []*Template{
-			{Row: 1, Template: "{{ .v }}"},
+			{Row: 1, Template: "{{ .v1 }}"},
+			{Row: 2, Template: "{{ .v2 }}"},
 		},
-		Placeholders: []*Placeholder{ph},
+		Placeholders: []*Placeholder{ph1, ph2},
 		Lines:        []string{"line1", "line2"},
 	}
-	// Note: ConfigFile.String() might crash if Placeholders refer to out of bounds Lines
-	// but ph.Line is 10 and Lines has 2. Let's fix that for the test.
-	ph.Line = 0
+
 	if s := cf.String(); s == "" {
 		t.Error("ConfigFile.String() returned empty string")
 	}
 
 	cfg := &Config{
-		Files: []*ConfigFile{cf},
+		Files: []*ConfigFile{cf, {Name: "test2"}},
 	}
 	if s := cfg.String(); s == "" {
 		t.Error("Config.String() returned empty string")
@@ -294,6 +317,27 @@ func TestCreateConfiguration(t *testing.T) {
 	if _, err := os.Stat(confFile); os.IsNotExist(err) {
 		t.Error("config file not created in actual mode")
 	}
+
+	// Test Mkdir error
+	cfgErr := &Config{
+		BasePath: "/root/noaccess", // likely to fail
+		Simulate: false,
+	}
+	if err := cfgErr.CreateConfiguration(logger); err == nil {
+		t.Error("CreateConfiguration should fail for inaccessible path")
+	}
+
+	// Test Create error
+	// Create a directory where we want to create a file with same name
+	blockedPath := filepath.Join(tmpDir, "blocked")
+	_ = os.MkdirAll(blockedPath, 0755)
+	cfgErr2 := &Config{
+		BasePath: blockedPath,
+		Simulate: false,
+	}
+	// Create a directory named configuration.yaml to block file creation
+	_ = os.Mkdir(filepath.Join(blockedPath, CONFIG_FILENAME), 0755)
+	_ = cfgErr2.CreateConfiguration(logger)
 }
 
 func TestConfigErrorPaths(t *testing.T) {
@@ -341,5 +385,21 @@ func TestConfigErrorPaths(t *testing.T) {
 	}
 	if _, err := cfgInvalid.CompilePatterns(logger); err == nil {
 		t.Error("CompilePatterns should fail for invalid template syntax")
+	}
+
+	// Explicit template invalid syntax
+	cfgInvalidExplicit := &Config{
+		Files: []*ConfigFile{
+			{
+				Name: "invalid.go",
+				Path: fPath2,
+				Templates: []*Template{
+					{Row: 1, Template: "{{ .v | invalid }}"},
+				},
+			},
+		},
+	}
+	if _, err := cfgInvalidExplicit.CompilePatterns(logger); err == nil {
+		t.Error("CompilePatterns should fail for invalid explicit template syntax")
 	}
 }

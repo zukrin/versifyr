@@ -20,4 +20,5 @@ Versifyr is a CLI tool designed to manage project versions across multiple files
 ### 4. Release Process
 - **Quality Assurance**: You MUST perform linting (e.g., `task lint`) and resolve ALL identified issues before merging a PR and BEFORE tagging a new release.
 - **Automation**: Be aware of CI/CD workflows (e.g., `.github/workflows/go2.yml`). Tagging a release triggers automated builds and artifact generation.
-- **Consistency**: Ensure the internal version matches the Git tag exactly.
+### 5. Environment Configuration
+- **GitHub CLI**: If using `gh`, ensure that `GH_HOST` and `GITHUB_TOKEN` are unset if they point to incorrect hosts or contain invalid credentials (e.g., if you are working on public GitHub but they default to an internal instance or expired token).
