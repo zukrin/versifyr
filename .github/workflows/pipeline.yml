@@ -110,43 +110,15 @@ jobs:
           token: ${{ github.token }}
 
       - name: release
-        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
-        id: create_release
+        uses: softprops/action-gh-release@c062e08bd532815e2082a85e87e3ef29c3e6d191 # v2.2.0
         with:
           draft: false
           prerelease: false
-          release_name: ${{ steps.version.outputs.version }}
-          tag_name: ${{ github.ref }}
+          name: ${{ steps.version.outputs.version }}
           body_path: CHANGELOG.md
+          files: |
+            dist/versifyr-linux-amd64.tar.gz
+            dist/versifyr-darwin-amd64.tar.gz
+            dist/versifyr-darwin-arm64.tar.gz
         env:
           GITHUB_TOKEN: ${{ github.token }}
-
-      - name: upload linux artifact
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/versifyr-linux-amd64.tar.gz
-          asset_name: versifyr-linux-amd64.tar.gz
-          asset_content_type: application/gzip
-
-      - name: upload darwin artifact
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/versifyr-darwin-amd64.tar.gz
-          asset_name: versifyr-darwin-amd64.tar.gz
-          asset_content_type: application/gzip
-
-      - name: upload darwin arm artifact
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/versifyr-darwin-arm64.tar.gz
-          asset_name: versifyr-darwin-arm64.tar.gz
-          asset_content_type: application/gzip
